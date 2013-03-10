@@ -2,9 +2,13 @@
 #define EGLINFO_PROCESS_EGL_HPP
 
 #include <vector>
-#include "egl_scope.hpp"
+
+#include <EGL/egl.h>
+#include <GLES2/gl2.h>
+
+#include "log.hpp"
 #include "platform.hpp"
-#include "scoped_resources.hpp"
+#include "scopes.hpp"
 
 
 namespace eglinfo
@@ -45,7 +49,7 @@ struct egl_config
 		, m_transparent_type
 		, m_transparent_rgb[3]
 
-		, m_caveats
+		, m_caveat
 
 		, m_pbuffer_maxwidth
 		, m_pbuffer_maxheight
@@ -103,7 +107,7 @@ bool process_egl_info(EGLWriter &p_egl_writer, egl_scope const &p_egl_scope)
 			config.m_index = i;
 
 			eglGetConfigAttrib(d, config_ids[i], EGL_CONFIG_ID,                &config.m_id);
-			eglGetConfigAttrib(d, config_ids[i], EGL_LEVEL,                    &config.m_framebuf_level);
+			eglGetConfigAttrib(d, config_ids[i], EGL_LEVEL,                    &config.m_level);
 			
 			eglGetConfigAttrib(d, config_ids[i], EGL_COLOR_BUFFER_TYPE,        &config.m_colorbuf_type);
 			eglGetConfigAttrib(d, config_ids[i], EGL_BUFFER_SIZE,              &config.m_colorbuf_size);
@@ -137,11 +141,11 @@ bool process_egl_info(EGLWriter &p_egl_writer, egl_scope const &p_egl_scope)
 			eglGetConfigAttrib(d, config_ids[i], EGL_TRANSPARENT_GREEN_VALUE,  &config.m_transparent_rgb[1]);
 			eglGetConfigAttrib(d, config_ids[i], EGL_TRANSPARENT_BLUE_VALUE,   &config.m_transparent_rgb[2]);
 
-			eglGetConfigAttrib(d, config_ids[i], EGL_CONFIG_CAVEATS,           &config.m_caveats);
+			eglGetConfigAttrib(d, config_ids[i], EGL_CONFIG_CAVEAT,            &config.m_caveat);
 
-			eglGetConfigAttrib(d, config_ids[i], EGL_PBUFFER_MAXWIDTH,         &config.m_pbuffer_maxwidth);
-			eglGetConfigAttrib(d, config_ids[i], EGL_PBUFFER_MAXHEIGHT,        &config.m_pbuffer_maxheight);
-			eglGetConfigAttrib(d, config_ids[i], EGL_PBUFFER_MAXPIXELS,        &config.m_pbuffer_maxpixels);
+			eglGetConfigAttrib(d, config_ids[i], EGL_MAX_PBUFFER_WIDTH,        &config.m_pbuffer_maxwidth);
+			eglGetConfigAttrib(d, config_ids[i], EGL_MAX_PBUFFER_HEIGHT,       &config.m_pbuffer_maxheight);
+			eglGetConfigAttrib(d, config_ids[i], EGL_MAX_PBUFFER_PIXELS,       &config.m_pbuffer_maxpixels);
 
 			eglGetConfigAttrib(d, config_ids[i], EGL_MIN_SWAP_INTERVAL,        &config.m_min_swap_interval);
 			eglGetConfigAttrib(d, config_ids[i], EGL_MAX_SWAP_INTERVAL,        &config.m_max_swap_interval);

@@ -25,7 +25,7 @@ native_display::native_display(char const *p_name)
 	if (p_name != 0)
 	{
 		std::stringstream sstr(p_name);
-		display_index >> sstr;
+		sstr >> display_index;
 	}
 
 	m_egl_native_display = fbGetDisplayByIndex(display_index);

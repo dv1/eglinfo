@@ -1,4 +1,5 @@
-#include "scoped_resources.hpp"
+#include "scopes.hpp"
+#include "log.hpp"
 
 
 namespace eglinfo
