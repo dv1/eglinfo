@@ -73,6 +73,7 @@ bool process_glapi_info(
 
 	p_glapi_writer.write_glapi_info(
 		  p_api
+		, p_api_name
 		, reinterpret_cast < char const * > (glGetString(GL_VERSION))
 		, reinterpret_cast < char const * > (glGetString(GL_RENDERER))
 		, reinterpret_cast < char const * > (glGetString(GL_EXTENSIONS))

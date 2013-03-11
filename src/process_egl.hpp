@@ -49,7 +49,7 @@ bool process_egl_info(writer &p_egl_writer, egl_scope const &p_egl_scope)
 	{
 		EGLDisplay d = p_egl_scope.get_display();
 
-		p_egl_writer.begin_write_egl_configs();
+		p_egl_writer.begin_write_egl_configs(num_configs);
 
 		for (EGLint i = 0; i < num_configs; ++i)
 		{

@@ -34,6 +34,9 @@ int main(int argc, char **argv)
 
 	egl_scope egl(d.get_egl_native_display());
 
+	eglinfo::text_writer writer(std::cout);
+	write_info(writer, egl);
+
 	return 0;
 }
 
