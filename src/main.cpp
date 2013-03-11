@@ -1,25 +1,26 @@
 #include "platform.hpp"
 #include "process_egl.hpp"
-#include "write_text.hpp"
-#include "write_json.hpp"
-#include "write_csv.hpp"
+#include "process_glapi.hpp"
+#include "writer.hpp"
+#include "text_writer.hpp"
+#include "json_writer.hpp"
+#include "csv_writer.hpp"
 
 
-template < typename Writer >
-void write_info(Writer &p_writer, eglinfo::egl_scope const &p_egl_scope)
+void write_info(eglinfo::writer &p_writer, eglinfo::egl_scope const &p_egl_scope)
 {
-	begin_write(p_writer);
+	p_writer.begin_write();
 
 	process_egl_info(p_writer, p_egl_scope);
 
-	next_api(p_writer);
+	p_writer.next_api();
 	process_glapi_info(p_writer, p_egl_scope, "OpenGL",      EGL_OPENGL_API,    EGL_OPENGL_BIT       );
-	next_api(p_writer);
+	p_writer.next_api();
 	process_glapi_info(p_writer, p_egl_scope, "OpenGL ES 1", EGL_OPENGL_ES_API, EGL_OPENGL_ES_BIT,  1);
-	next_api(p_writer);
+	p_writer.next_api();
 	process_glapi_info(p_writer, p_egl_scope, "OpenGL ES 2", EGL_OPENGL_ES_API, EGL_OPENGL_ES2_BIT, 2);
 
-	end_write(p_writer);
+	p_writer.end_write();
 }
 
 
