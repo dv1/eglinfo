@@ -1,6 +1,15 @@
+#include <config.h>
+
 #include "platform.hpp"
+
 #include "process_egl.hpp"
+#if defined(WITH_GLES1) || defined(WITH_GLES2) || defined(WITH_OPENGL)
 #include "process_glapi.hpp"
+#endif
+#if defined(WITH_OPENVG)
+#include "process_openvg.hpp"
+#endif
+
 #include "writer.hpp"
 #include "text_writer.hpp"
 #include "json_writer.hpp"
@@ -11,14 +20,24 @@ void write_info(eglinfo::writer &p_writer, eglinfo::egl_scope const &p_egl_scope
 {
 	p_writer.begin_write();
 
-	process_egl_info(p_writer, p_egl_scope);
+	eglinfo::process_egl_info(p_writer, p_egl_scope);
 
+#if defined(WITH_GLES1) || defined(WITH_GLES2) || defined(WITH_OPENGL)
 	p_writer.next_api();
-	process_glapi_info(p_writer, p_egl_scope, "OpenGL",      EGL_OPENGL_API,    EGL_OPENGL_BIT       );
+	eglinfo::process_glapi_info(p_writer, p_egl_scope, "OpenGL",      EGL_OPENGL_API,    EGL_OPENGL_BIT       );
+#endif
+#if defined(WITH_GLES1)
 	p_writer.next_api();
-	process_glapi_info(p_writer, p_egl_scope, "OpenGL ES 1", EGL_OPENGL_ES_API, EGL_OPENGL_ES_BIT,  1);
+	eglinfo::process_glapi_info(p_writer, p_egl_scope, "OpenGL ES 1", EGL_OPENGL_ES_API, EGL_OPENGL_ES_BIT,  1);
+#endif
+#if defined(WITH_GLES2)
 	p_writer.next_api();
-	process_glapi_info(p_writer, p_egl_scope, "OpenGL ES 2", EGL_OPENGL_ES_API, EGL_OPENGL_ES2_BIT, 2);
+	eglinfo::process_glapi_info(p_writer, p_egl_scope, "OpenGL ES 2", EGL_OPENGL_ES_API, EGL_OPENGL_ES2_BIT, 2);
+#endif
+#if defined(WITH_OPENVG)
+	p_writer.next_api();
+	eglinfo::process_vg_info(p_writer, p_egl_scope);
+#endif
 
 	p_writer.end_write();
 }

@@ -274,5 +274,76 @@ void text_writer::write_glapi_info(
 }
 
 
+void text_writer::write_main_vg_info(
+	  char const *p_vendor
+	, char const *p_version
+	, char const *p_renderer
+	, char const *p_extensions
+)
+{
+	m_out << "OpenVG information:\n";
+
+	std::cout
+		<< "    vendor string:   " << p_vendor << "\n"
+		<< "    version string:  " << p_version << "\n"
+		<< "    renderer string: " << p_renderer << "\n"
+		;
+
+	std::cout
+		<< "    extensions:\n"
+		;
+	print_list("      ", p_extensions);
+}
+
+
+void text_writer::begin_write_vg_image_format_acceleration()
+{
+	std::cout
+		<< "    image format acceleration:\n"
+		<< "      image format   accelerated\n"
+		;
+}
+
+
+void text_writer::write_vg_image_format_acceleration(
+	  int const
+	, char const *p_name
+	, bool const p_accelerated
+)
+{
+	std::cout << std::setw(18) << p_name;
+	std::cout << "   ";
+	std::cout << std::setw(11) << (p_accelerated ? "yes" : "no");
+	std::cout << "\n";
+}
+
+
+void text_writer::end_write_vg_image_format_acceleration()
+{
+}
+
+
+void text_writer::write_vg_path_datatype_acceleration(
+	  bool const p_signed8
+	, bool const p_signed16
+	, bool const p_signed32
+	, bool const p_float
+)
+{
+	std::cout
+		<< "    path datatype acceleration:\n"
+		<< "       s8  s16  s32    f\n"
+		<< std::setw(9) << p_signed8
+		<< " "
+		<< std::setw(4) << p_signed16
+		<< " "
+		<< std::setw(4) << p_signed32
+		<< " "
+		<< std::setw(4) << p_float
+		<< "\n"
+		;
+}
+
+
 } // namespace eglinfo end
 

@@ -38,6 +38,28 @@ public:
 		, char const *p_extensions
 	) = 0;
 
+	virtual void write_main_vg_info(
+		  char const *p_vendor
+		, char const *p_version
+		, char const *p_renderer
+		, char const *p_extensions
+	) = 0;
+
+	virtual void begin_write_vg_image_format_acceleration() = 0;
+	virtual void write_vg_image_format_acceleration(
+		  int const p_format
+		, char const *p_name
+		, bool const p_accelerated
+	) = 0;
+	virtual void end_write_vg_image_format_acceleration() = 0;
+	
+	virtual void write_vg_path_datatype_acceleration(
+		  bool const p_signed8
+		, bool const p_signed16
+		, bool const p_signed32
+		, bool const p_float
+	) = 0;
+
 	virtual ~writer()
 	{
 	}
