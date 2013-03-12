@@ -12,6 +12,12 @@ namespace
 {
 
 
+char const * yesno(bool const b)
+{
+	return b ? "yes" : "no";
+}
+
+
 void print_list(char const *p_prefix, char const *p_list)
 {
 	if (p_list == NULL)
@@ -227,7 +233,7 @@ void text_writer::write_egl_config(egl_config const &p_egl_config)
 
 	print_renderables(m_out, p_egl_config.m_renderables, 12);
 	m_out << " ";
-	m_out << std::setw(6) << (p_egl_config.m_native_renderable ? "yes" : "no");
+	m_out << std::setw(6) << yesno(p_egl_config.m_native_renderable);
 
 	m_out << "   ";
 
@@ -313,7 +319,7 @@ void text_writer::write_vg_image_format_acceleration(
 {
 	std::cout << std::setw(18) << p_name;
 	std::cout << "   ";
-	std::cout << std::setw(11) << (p_accelerated ? "yes" : "no");
+	std::cout << std::setw(11) << yesno(p_accelerated);
 	std::cout << "\n";
 }
 
@@ -333,13 +339,13 @@ void text_writer::write_vg_path_datatype_acceleration(
 	std::cout
 		<< "    path datatype acceleration:\n"
 		<< "       s8  s16  s32    f\n"
-		<< std::setw(9) << p_signed8
+		<< std::setw(9) << yesno(p_signed8)
 		<< " "
-		<< std::setw(4) << p_signed16
+		<< std::setw(4) << yesno(p_signed16)
 		<< " "
-		<< std::setw(4) << p_signed32
+		<< std::setw(4) << yesno(p_signed32)
 		<< " "
-		<< std::setw(4) << p_float
+		<< std::setw(4) << yesno(p_float)
 		<< "\n"
 		;
 }

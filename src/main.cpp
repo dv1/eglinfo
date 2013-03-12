@@ -22,7 +22,7 @@ void write_info(eglinfo::writer &p_writer, eglinfo::egl_scope const &p_egl_scope
 
 	eglinfo::process_egl_info(p_writer, p_egl_scope);
 
-#if defined(WITH_GLES1) || defined(WITH_GLES2) || defined(WITH_OPENGL)
+#if defined(WITH_OPENGL)
 	p_writer.next_api();
 	eglinfo::process_glapi_info(p_writer, p_egl_scope, "OpenGL",      EGL_OPENGL_API,    EGL_OPENGL_BIT       );
 #endif

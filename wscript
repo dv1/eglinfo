@@ -125,17 +125,18 @@ def configure_beagleboard_device(conf, platform):
 
 def configure_imx6_device(conf, platform):
 	conf.env['PLATFORM_USELIBS'] = ['GLES2', 'OPENVG', 'EGL']
+	conf.env['WITH_APIS'] = ['GLES1', 'GLES2', 'OPENVG']
 	if platform == "x11":
 		check_x11(conf)
 		check_vivante_egl(conf, None)
 		conf.env['PLATFORM_SOURCE'] = ['src/platform_x11_generic.cpp']
 		conf.env['PLATFORM_USELIBS'] += ["X11"]
+		conf.env['WITH_APIS'] += ['OPENGL']
 	elif platform == "fb":
 		check_vivante_egl(conf, 'EGL_API_FB')
 		conf.env['PLATFORM_SOURCE'] = ['src/platform_fb_imx6.cpp']
 	check_gles2(conf)
 	check_openvg(conf)
-	conf.env['WITH_APIS'] = ['GLES1', 'GLES2', 'OPENVG', 'OPENGL']
 
 
 def configure_generic_device(conf, platform):
@@ -168,9 +169,11 @@ def configure_generic_device(conf, platform):
 	elif with_gles1:
 		conf.env['WITH_APIS'] += ['GLES1']
 		gluselib = 'GLES1'
-	elif with_opengl:
+
+	if with_opengl:
 		conf.env['WITH_APIS'] += ['OPENGL']
-		gluselib = 'OPENGL'
+		if not gluselib:
+			gluselib = 'OPENGL'
 
 	if gluselib:
 		conf.env['PLATFORM_USELIBS'] += [gluselib]
