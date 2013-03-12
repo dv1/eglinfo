@@ -260,7 +260,7 @@ void text_writer::write_no_egl_configs()
 }
 
 
-void text_writer::write_glapi_info(
+void text_writer::write_main_glapi_info(
 	  EGLenum const
 	, char const *p_api_name
 	, char const *p_version

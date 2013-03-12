@@ -13,6 +13,21 @@ namespace eglinfo
 {
 
 
+namespace
+{
+
+
+GLint get_gl_integer(GLenum const p_name)
+{
+	GLint i;
+	glGetIntegerv(p_name, &i);
+	return i;
+}
+
+
+}
+
+
 bool process_glapi_info(
 	  writer &p_glapi_writer
 	, egl_scope const &p_egl_scope
@@ -68,13 +83,59 @@ bool process_glapi_info(
 		return false;
 	}
 
-	p_glapi_writer.write_glapi_info(
+	/*
+	max texture size  glGetIntegerv(GL_MAX_TEXTURE_SIZE)
+	max texture cube map  glGetIntegerv(GL_MAX_CUBE_MAP_TEXTURE_SIZE)
+	max texture image units  glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS)
+	read color format
+	read color type
+	max render buffer size  glGetIntegerv(GL_MAX_RENDERBUFFER_SIZE)
+	max combined texture image units  glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS)
+	(num) compressed texture formats  glGetIntegerv(GL_NUM_COMPRESSED_TEXTURE_FORMATS) & GL_COMPRESSED_TEXTURE_FORMATS
+	max texture anisotropy  
+
+	shader specific:
+	max vertex attribs  glGetIntegerv(GL_MAX_VERTEX_ATTRIBS)
+	max vertex texture image units  glGetIntegerv(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS)
+	max program binary formats  glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS)
+	max shader binary formats  glGetIntegerv(GL_NUM_SHADER_BINARY_FORMATS)
+	max varying vectors  glGetIntegerv(GL_MAX_VARYING_VECTORS)
+	max vertex uniform vectors  glGetIntegerv(GL_MAX_VERTEX_UNIFORM_VECTORS)
+	max fragment uniform vectors  glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_VECTORS)
+	*/
+
+	p_glapi_writer.write_main_glapi_info(
 		  p_api
 		, p_api_name
 		, reinterpret_cast < char const * > (glGetString(GL_VERSION))
 		, reinterpret_cast < char const * > (glGetString(GL_RENDERER))
 		, reinterpret_cast < char const * > (glGetString(GL_EXTENSIONS))
 	);
+
+	// TODO: create glapi_stats struct, containing main and shader stats (and list of compressed formats)
+
+/*	p_glapi_writer.write_glapi_main_stats(
+		  p_api
+		, p_api_name
+		, get_gl_integer(GL_MAX_TEXTURE_SIZE)
+		, get_gl_integer(GL_MAX_CUBE_MAP_TEXTURE_SIZE)
+		, get_gl_integer(GL_MAX_TEXTURE_IMAGE_UNITS)
+		, get_gl_integer(GL_MAX_RENDERBUFFER_SIZE)
+		, get_gl_integer(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS)
+		, get_gl_integer(GL_NUM_COMPRESSED_TEXTURE_FORMATS)
+	);
+
+	p_glapi_writer.write_glapi_shader_stats(
+		  p_api
+		, p_api_name
+		, get_gl_integer(GL_MAX_VERTEX_ATTRIBS)
+		, get_gl_integer(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS)
+		, get_gl_integer(GL_NUM_PROGRAM_BINARY_FORMATS)
+		, get_gl_integer(GL_NUM_SHADER_BINARY_FORMATS)
+		, get_gl_integer(GL_MAX_VARYING_VECTORS)
+		, get_gl_integer(GL_MAX_VERTEX_UNIFORM_VECTORS)
+		, get_gl_integer(GL_MAX_FRAGMENT_UNIFORM_VECTORS)
+	);*/
 
 	eglMakeCurrent(p_egl_scope.get_display(), EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
 

@@ -30,7 +30,7 @@ public:
 	virtual void end_write_egl_configs() = 0;
 	virtual void write_no_egl_configs() = 0;
 
-	virtual void write_glapi_info(
+	virtual void write_main_glapi_info(
 		  EGLenum const p_api
 		, char const *p_api_name
 		, char const *p_version
