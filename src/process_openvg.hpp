@@ -9,7 +9,7 @@ namespace eglinfo
 {
 
 
-void print_vg_info(writer &p_vg_writer, scoped_egl_init const &p_egl);
+void process_vg_info(writer &p_vg_writer, egl_scope const &p_egl_scope);
 
 
 } // namespace eglinfo end

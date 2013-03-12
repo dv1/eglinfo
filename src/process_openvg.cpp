@@ -1,7 +1,7 @@
 #include <vector>
 
 #include <EGL/egl.h>
-#include <GLES2/gl2.h>
+#include <VG/openvg.h>
 
 #include "process_openvg.hpp"
 
@@ -85,7 +85,7 @@ image_format_accel_entry const image_format_accel_table[] =
 
 
 
-void print_vg_info(writer &p_vg_writer, scoped_egl_init const &p_egl)
+void process_vg_info(writer &p_vg_writer, egl_scope const &p_egl_scope)
 {
 	std::cout << "OpenVG information:\n";
 
@@ -100,28 +100,28 @@ void print_vg_info(writer &p_vg_writer, scoped_egl_init const &p_egl)
 
 	EGLint num_configs;
 	EGLConfig config;
-	if (!eglChooseConfig(p_egl.get_display(), attribs, &config, 1, &num_configs) || (num_configs < 1))
+	if (!eglChooseConfig(p_egl_scope.get_display(), attribs, &config, 1, &num_configs) || (num_configs < 1))
 	{
 		PRINT_EGL_ERROR("Could not find config for OpenVG (perhaps this API is unsupported?)");
 		return;
 	}
 
 	EGLint vid;
-	if (!eglGetConfigAttrib(p_egl.get_display(), config, EGL_NATIVE_VISUAL_ID, &vid))
+	if (!eglGetConfigAttrib(p_egl_scope.get_display(), config, EGL_NATIVE_VISUAL_ID, &vid))
 	{
 		PRINT_EGL_ERROR("Could not get native visual ID from chosen config");
 		return;
 	}
 
 
-	native_window window(p_egl.get_egl_native_display(), vid);
+	native_window window(p_egl_scope.get_egl_native_display(), vid);
 
 	eglBindAPI(EGL_OPENVG_API);
 
-	scoped_context context(p_egl.get_display(), eglCreateContext(p_egl.get_display(), config, EGL_NO_CONTEXT, NULL));
-	scoped_surface surface(p_egl.get_display(), eglCreateWindowSurface(p_egl.get_display(), config, window.get_egl_native_window(), NULL));
+	scoped_context context(p_egl_scope.get_display(), eglCreateContext(p_egl_scope.get_display(), config, EGL_NO_CONTEXT, NULL));
+	scoped_surface surface(p_egl_scope.get_display(), eglCreateWindowSurface(p_egl_scope.get_display(), config, window.get_egl_native_window(), NULL));
 
-	if (!eglMakeCurrent(p_egl.get_display(), surface.get_surface(), surface.get_surface(), context.get_context()))
+	if (!eglMakeCurrent(p_egl_scope.get_display(), surface.get_surface(), surface.get_surface(), context.get_context()))
 	{
 		PRINT_EGL_ERROR("eglMakeCurrent() failed");
 		return;
@@ -149,7 +149,7 @@ void print_vg_info(writer &p_vg_writer, scoped_egl_init const &p_egl)
 		, get_path_datatype_acceleration(VG_PATH_DATATYPE_F)
 	);
 
-	eglMakeCurrent(p_egl.get_display(), EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+	eglMakeCurrent(p_egl_scope.get_display(), EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
 }
 
 
