@@ -46,7 +46,7 @@ def check_lib_list(conf, uselib, uselib_store, lib_list):
 
 
 valid_platforms = ['fb', 'x11']
-valid_devices = ['generic', 'imx6']
+valid_devices = ['generic', 'imx6', 'beagleboard']
 
 
 def options(opt):
@@ -106,6 +106,21 @@ def check_vivante_egl(conf, egl_macro):
 	conf.env['CXXFLAGS_EGL'] += extra_cxxflags
 	conf.env['CXXFLAGS'] = old_cxxflags
 	conf.define('WITH_VIVANTE_EGL', 1)
+
+
+def configure_beagleboard_device(conf, platform):
+	conf.env['PLATFORM_USELIBS'] = ['GLES2', 'OPENVG', 'EGL']
+	if platform == "x11":
+		check_x11(conf)
+		conf.env['PLATFORM_SOURCE'] = ['src/platform_x11_generic.cpp']
+		conf.env['PLATFORM_USELIBS'] += ["X11"]
+	elif platform == "fb":
+		conf.env['PLATFORM_SOURCE'] = ['src/platform_fb_generic.cpp']
+	conf.check_cxx(mandatory = 1, lib = ['EGL', 'IMGegl', 'srv_um'], uselib_store = 'EGL')
+	conf.check_cxx(mandatory = 1, header_name = 'EGL/egl.h', uselib_store = 'EGL')
+	check_gles2(conf)
+	check_openvg(conf)
+	conf.env['WITH_APIS'] = ['GLES1', 'GLES2', 'OPENVG', 'OPENGL']
 
 
 def configure_imx6_device(conf, platform):
@@ -194,7 +209,9 @@ def configure(conf):
 	add_compiler_flags(conf, conf.env, compiler_flags, 'CXX', 'CXX')
 
 	# device specifics
-	if conf.options.device == "imx6":
+	if conf.options.device == "beagleboard":
+		configure_beagleboard_device(conf, conf.options.platform)
+	elif conf.options.device == "imx6":
 		configure_imx6_device(conf, conf.options.platform)
 	elif conf.options.device == "generic":
 		configure_generic_device(conf, conf.options.platform)
