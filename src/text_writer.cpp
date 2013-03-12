@@ -280,6 +280,37 @@ void text_writer::write_main_glapi_info(
 }
 
 
+void text_writer::write_glapi_stats(
+	  EGLenum const p_api
+	, char const *p_api_name
+	, glapi_stats const &p_stats
+)
+{
+	m_out
+		<< "main " << p_api_name << " stats:\n"
+		<< "    max texture size:                 " << p_stats.m_main_stats.m_max_texture_size << "\n"
+		<< "    max cubemap texture size:         " << p_stats.m_main_stats.m_max_cubemap_texture_size << "\n"
+		<< "    max texture image units:          " << p_stats.m_main_stats.m_max_texture_image_units << "\n"
+		<< "    max renderbuffer size:            " << p_stats.m_main_stats.m_max_renderbuffer_size << "\n"
+		<< "    max combined texture image units: " << p_stats.m_main_stats.m_max_combined_texture_image_units << "\n"
+		<< "    num compressed texture formats:   " << p_stats.m_main_stats.m_num_compressed_texture_formats << "\n"
+		;
+
+	if (p_stats.m_shader_capable)
+	{
+		m_out
+			<< "shader specific " << p_api_name << " stats:\n"
+			<< "    max vertex attribs:             " << p_stats.m_shader_stats.m_max_vertex_attribs << "\n"
+			<< "    max vertex texture image units: " << p_stats.m_shader_stats.m_max_vertex_texture_image_units << "\n"
+			<< "    num shader binary formats:      " << p_stats.m_shader_stats.m_num_shader_binary_formats << "\n"
+			<< "    max varying vectors:            " << p_stats.m_shader_stats.m_max_varying_vectors << "\n"
+			<< "    max vertex uniform vectors:     " << p_stats.m_shader_stats.m_max_vertex_uniform_vectors << "\n"
+			<< "    max fragment uniform vectors:   " << p_stats.m_shader_stats.m_max_fragment_uniform_vectors << "\n"
+			;
+	}
+}
+
+
 void text_writer::write_main_vg_info(
 	  char const *p_vendor
 	, char const *p_version

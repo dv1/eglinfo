@@ -3,6 +3,7 @@
 
 #include <EGL/egl.h>
 #include "egl_config.hpp"
+#include "glapi_stats.hpp"
 
 
 namespace eglinfo
@@ -36,6 +37,12 @@ public:
 		, char const *p_version
 		, char const *p_renderer
 		, char const *p_extensions
+	) = 0;
+
+	virtual void write_glapi_stats(
+		  EGLenum const p_api
+		, char const *p_api_name
+		, glapi_stats const &p_stats
 	) = 0;
 
 	virtual void write_main_vg_info(

@@ -240,6 +240,7 @@ def build(bld):
 		"src/process_egl.cpp", \
 		"src/scopes.cpp", \
 		"src/text_writer.cpp", \
+		"src/glapi_stats.cpp", \
 	]
 	bld(
 		features = ['cxx', 'cxxprogram'],

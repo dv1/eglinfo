@@ -24,15 +24,15 @@ void write_info(eglinfo::writer &p_writer, eglinfo::egl_scope const &p_egl_scope
 
 #if defined(WITH_OPENGL)
 	p_writer.next_api();
-	eglinfo::process_glapi_info(p_writer, p_egl_scope, "OpenGL",      EGL_OPENGL_API,    EGL_OPENGL_BIT       );
+	eglinfo::process_glapi_info(p_writer, p_egl_scope, "OpenGL",      EGL_OPENGL_API,    true,  EGL_OPENGL_BIT       );
 #endif
 #if defined(WITH_GLES1)
 	p_writer.next_api();
-	eglinfo::process_glapi_info(p_writer, p_egl_scope, "OpenGL ES 1", EGL_OPENGL_ES_API, EGL_OPENGL_ES_BIT,  1);
+	eglinfo::process_glapi_info(p_writer, p_egl_scope, "OpenGL ES 1", EGL_OPENGL_ES_API, false, EGL_OPENGL_ES_BIT,  1);
 #endif
 #if defined(WITH_GLES2)
 	p_writer.next_api();
-	eglinfo::process_glapi_info(p_writer, p_egl_scope, "OpenGL ES 2", EGL_OPENGL_ES_API, EGL_OPENGL_ES2_BIT, 2);
+	eglinfo::process_glapi_info(p_writer, p_egl_scope, "OpenGL ES 2", EGL_OPENGL_ES_API, true,  EGL_OPENGL_ES2_BIT, 2);
 #endif
 #if defined(WITH_OPENVG)
 	p_writer.next_api();

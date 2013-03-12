@@ -41,6 +41,12 @@ public:
 		, char const *p_extensions
 	);
 
+	virtual void write_glapi_stats(
+		  EGLenum const p_api
+		, char const *p_api_name
+		, glapi_stats const &p_stats
+	);
+
 	virtual void write_main_vg_info(
 		  char const *p_vendor
 		, char const *p_version

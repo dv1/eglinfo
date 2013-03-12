@@ -15,6 +15,7 @@ bool process_glapi_info(
 	, egl_scope const &p_egl_scope
 	, char const *p_api_name
 	, EGLenum const p_api
+	, bool const p_shader_capable
 	, EGLint const p_renderable_type
 	, EGLint const p_client_version = -1
 );

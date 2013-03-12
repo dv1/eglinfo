@@ -1,12 +1,19 @@
+#include <config.h>
 #include <vector>
 
 #include <EGL/egl.h>
 #include <GLES2/gl2.h>
 
+#include "glapi_stats.hpp"
 #include "process_glapi.hpp"
 
 #include "log.hpp"
 #include "platform.hpp"
+
+
+#if defined (WITH_OPENGL) || defined(WITH_GLES2)
+#define PROCESS_SHADER_STATS 1
+#endif
 
 
 namespace eglinfo
@@ -33,6 +40,7 @@ bool process_glapi_info(
 	, egl_scope const &p_egl_scope
 	, char const *p_api_name
 	, EGLenum const p_api
+	, bool const p_shader_capable
 	, EGLint const p_renderable_type
 	, EGLint const p_client_version
 )
@@ -112,30 +120,30 @@ bool process_glapi_info(
 		, reinterpret_cast < char const * > (glGetString(GL_EXTENSIONS))
 	);
 
-	// TODO: create glapi_stats struct, containing main and shader stats (and list of compressed formats)
+	glapi_stats stats;
 
-/*	p_glapi_writer.write_glapi_main_stats(
-		  p_api
-		, p_api_name
-		, get_gl_integer(GL_MAX_TEXTURE_SIZE)
-		, get_gl_integer(GL_MAX_CUBE_MAP_TEXTURE_SIZE)
-		, get_gl_integer(GL_MAX_TEXTURE_IMAGE_UNITS)
-		, get_gl_integer(GL_MAX_RENDERBUFFER_SIZE)
-		, get_gl_integer(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS)
-		, get_gl_integer(GL_NUM_COMPRESSED_TEXTURE_FORMATS)
-	);
+	stats.m_main_stats.m_max_texture_size = get_gl_integer(GL_MAX_TEXTURE_SIZE);
+	stats.m_main_stats.m_max_cubemap_texture_size = get_gl_integer(GL_MAX_CUBE_MAP_TEXTURE_SIZE);
+	stats.m_main_stats.m_max_texture_image_units = get_gl_integer(GL_MAX_TEXTURE_IMAGE_UNITS);
+	stats.m_main_stats.m_max_renderbuffer_size = get_gl_integer(GL_MAX_RENDERBUFFER_SIZE);
+	stats.m_main_stats.m_max_combined_texture_image_units = get_gl_integer(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS);
+	stats.m_main_stats.m_num_compressed_texture_formats = get_gl_integer(GL_NUM_COMPRESSED_TEXTURE_FORMATS);
 
-	p_glapi_writer.write_glapi_shader_stats(
-		  p_api
-		, p_api_name
-		, get_gl_integer(GL_MAX_VERTEX_ATTRIBS)
-		, get_gl_integer(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS)
-		, get_gl_integer(GL_NUM_PROGRAM_BINARY_FORMATS)
-		, get_gl_integer(GL_NUM_SHADER_BINARY_FORMATS)
-		, get_gl_integer(GL_MAX_VARYING_VECTORS)
-		, get_gl_integer(GL_MAX_VERTEX_UNIFORM_VECTORS)
-		, get_gl_integer(GL_MAX_FRAGMENT_UNIFORM_VECTORS)
-	);*/
+#ifdef PROCESS_SHADER_STATS
+	if (p_shader_capable)
+	{
+		stats.m_shader_capable = true;
+
+		stats.m_shader_stats.m_max_vertex_attribs = get_gl_integer(GL_MAX_VERTEX_ATTRIBS);
+		stats.m_shader_stats.m_max_vertex_texture_image_units = get_gl_integer(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS);
+		stats.m_shader_stats.m_num_shader_binary_formats = get_gl_integer(GL_NUM_SHADER_BINARY_FORMATS);
+		stats.m_shader_stats.m_max_varying_vectors = get_gl_integer(GL_MAX_VARYING_VECTORS);
+		stats.m_shader_stats.m_max_vertex_uniform_vectors = get_gl_integer(GL_MAX_VERTEX_UNIFORM_VECTORS);
+		stats.m_shader_stats.m_max_fragment_uniform_vectors = get_gl_integer(GL_MAX_FRAGMENT_UNIFORM_VECTORS);
+	}
+#endif
+
+	p_glapi_writer.write_glapi_stats(p_api, p_api_name, stats);
 
 	eglMakeCurrent(p_egl_scope.get_display(), EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
 
