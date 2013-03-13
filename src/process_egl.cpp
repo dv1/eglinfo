@@ -1,7 +1,6 @@
 #include <vector>
 
 #include <EGL/egl.h>
-#include <GLES2/gl2.h>
 
 #include "process_egl.hpp"
 #include "log.hpp"

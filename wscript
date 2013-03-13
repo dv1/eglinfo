@@ -74,15 +74,19 @@ def check_openvg(conf, uselib = 'EGL'):
 
 
 def check_gles1(conf, uselib = 'EGL', lib_list = ['GLESv1_CM', 'GLESV1_CL']):
-	return \
+	retval = \
 	  check_lib_list(conf = conf, uselib = uselib, uselib_store = 'GLES1', lib_list = lib_list) and \
 	  conf.check_cxx(mandatory = 0, header_name = 'GLES/gl.h', uselib = uselib, uselib_store = 'GLES1')
+	conf.check_cxx(mandatory = 0, header_name = ['GLES2/gl2.h', 'GLES2/gl2ext.h'], uselib = uselib, define_name = 'WITH_GLEXT_H', uselib_store = 'GLES2')
+	return retval
 
 
 def check_gles2(conf, uselib = 'EGL', lib_list = ['GLESv2']):
-	return \
+	retval = \
 	  check_lib_list(conf = conf, uselib = uselib, uselib_store = 'GLES2', lib_list = lib_list) and \
-          conf.check_cxx(mandatory = 0, header_name = 'GLES2/gl2.h', uselib = uselib, uselib_store = 'GLES2')
+	  conf.check_cxx(mandatory = 0, header_name = 'GLES2/gl2.h', uselib = uselib, uselib_store = 'GLES2')
+	conf.check_cxx(mandatory = 0, header_name = ['GLES2/gl2.h', 'GLES2/gl2ext.h'], uselib = uselib, define_name = 'WITH_GL2EXT_H', uselib_store = 'GLES2')
+	return retval
 
 
 def check_opengl(conf, uselib = 'EGL'):

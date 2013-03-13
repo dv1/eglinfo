@@ -2,7 +2,7 @@
 #include <vector>
 
 #include <EGL/egl.h>
-#include <GLES2/gl2.h>
+#include "opengl.hpp"
 
 #include "glapi_stats.hpp"
 #include "process_glapi.hpp"
@@ -91,27 +91,6 @@ bool process_glapi_info(
 		return false;
 	}
 
-	/*
-	max texture size  glGetIntegerv(GL_MAX_TEXTURE_SIZE)
-	max texture cube map  glGetIntegerv(GL_MAX_CUBE_MAP_TEXTURE_SIZE)
-	max texture image units  glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS)
-	read color format
-	read color type
-	max render buffer size  glGetIntegerv(GL_MAX_RENDERBUFFER_SIZE)
-	max combined texture image units  glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS)
-	(num) compressed texture formats  glGetIntegerv(GL_NUM_COMPRESSED_TEXTURE_FORMATS) & GL_COMPRESSED_TEXTURE_FORMATS
-	max texture anisotropy  
-
-	shader specific:
-	max vertex attribs  glGetIntegerv(GL_MAX_VERTEX_ATTRIBS)
-	max vertex texture image units  glGetIntegerv(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS)
-	max program binary formats  glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS)
-	max shader binary formats  glGetIntegerv(GL_NUM_SHADER_BINARY_FORMATS)
-	max varying vectors  glGetIntegerv(GL_MAX_VARYING_VECTORS)
-	max vertex uniform vectors  glGetIntegerv(GL_MAX_VERTEX_UNIFORM_VECTORS)
-	max fragment uniform vectors  glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_VECTORS)
-	*/
-
 	p_glapi_writer.write_main_glapi_info(
 		  p_api
 		, p_api_name
@@ -122,24 +101,45 @@ bool process_glapi_info(
 
 	glapi_stats stats;
 
-	stats.m_main_stats.m_max_texture_size = get_gl_integer(GL_MAX_TEXTURE_SIZE);
-	stats.m_main_stats.m_max_cubemap_texture_size = get_gl_integer(GL_MAX_CUBE_MAP_TEXTURE_SIZE);
-	stats.m_main_stats.m_max_texture_image_units = get_gl_integer(GL_MAX_TEXTURE_IMAGE_UNITS);
-	stats.m_main_stats.m_max_renderbuffer_size = get_gl_integer(GL_MAX_RENDERBUFFER_SIZE);
-	stats.m_main_stats.m_max_combined_texture_image_units = get_gl_integer(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS);
-	stats.m_main_stats.m_num_compressed_texture_formats = get_gl_integer(GL_NUM_COMPRESSED_TEXTURE_FORMATS);
+	stats.m_main_stats.m_max_texture_size                   = get_gl_integer(GL_MAX_TEXTURE_SIZE);
+	stats.m_main_stats.m_max_cubemap_texture_size           = get_gl_integer(GL_MAX_CUBE_MAP_TEXTURE_SIZE);
+	stats.m_main_stats.m_max_texture_image_units            = get_gl_integer(GL_MAX_TEXTURE_IMAGE_UNITS);
+	stats.m_main_stats.m_max_renderbuffer_size              = get_gl_integer(GL_MAX_RENDERBUFFER_SIZE);
+	stats.m_main_stats.m_max_combined_texture_image_units   = get_gl_integer(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS);
+	stats.m_main_stats.m_num_compressed_texture_formats     = get_gl_integer(GL_NUM_COMPRESSED_TEXTURE_FORMATS);
+	stats.m_main_stats.m_implementation_color_read_format   = get_gl_integer(GL_IMPLEMENTATION_COLOR_READ_FORMAT);
+	stats.m_main_stats.m_implementation_color_read_type     = get_gl_integer(GL_IMPLEMENTATION_COLOR_READ_TYPE);
+	stats.m_main_stats.m_subpixel_bits                      = get_gl_integer(GL_SUBPIXEL_BITS);
+
+	glGetIntegerv(GL_ALIASED_LINE_WIDTH_RANGE, stats.m_main_stats.m_aliased_line_width_range);
+	glGetIntegerv(GL_ALIASED_POINT_SIZE_RANGE, stats.m_main_stats.m_aliased_point_size_range);
+	glGetIntegerv(GL_MAX_VIEWPORT_DIMS,        stats.m_main_stats.m_max_viewport_dims);
+
+	if (stats.m_main_stats.m_num_compressed_texture_formats > 0)
+	{
+		stats.m_main_stats.m_compressed_texture_formats.resize(stats.m_main_stats.m_num_compressed_texture_formats);
+		glGetIntegerv(GL_COMPRESSED_TEXTURE_FORMATS, &(stats.m_main_stats.m_compressed_texture_formats[0]));
+	}
+
 
 #ifdef PROCESS_SHADER_STATS
 	if (p_shader_capable)
 	{
 		stats.m_shader_capable = true;
 
-		stats.m_shader_stats.m_max_vertex_attribs = get_gl_integer(GL_MAX_VERTEX_ATTRIBS);
+		stats.m_shader_stats.m_max_vertex_attribs             = get_gl_integer(GL_MAX_VERTEX_ATTRIBS);
 		stats.m_shader_stats.m_max_vertex_texture_image_units = get_gl_integer(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS);
-		stats.m_shader_stats.m_num_shader_binary_formats = get_gl_integer(GL_NUM_SHADER_BINARY_FORMATS);
-		stats.m_shader_stats.m_max_varying_vectors = get_gl_integer(GL_MAX_VARYING_VECTORS);
-		stats.m_shader_stats.m_max_vertex_uniform_vectors = get_gl_integer(GL_MAX_VERTEX_UNIFORM_VECTORS);
-		stats.m_shader_stats.m_max_fragment_uniform_vectors = get_gl_integer(GL_MAX_FRAGMENT_UNIFORM_VECTORS);
+		stats.m_shader_stats.m_num_shader_binary_formats      = get_gl_integer(GL_NUM_SHADER_BINARY_FORMATS);
+		stats.m_shader_stats.m_max_varying_vectors            = get_gl_integer(GL_MAX_VARYING_VECTORS);
+		stats.m_shader_stats.m_max_vertex_uniform_vectors     = get_gl_integer(GL_MAX_VERTEX_UNIFORM_VECTORS);
+		stats.m_shader_stats.m_max_fragment_uniform_vectors   = get_gl_integer(GL_MAX_FRAGMENT_UNIFORM_VECTORS);
+		stats.m_shader_stats.m_shader_compiler                = get_gl_integer(GL_SHADER_COMPILER);
+
+		if (stats.m_shader_stats.m_num_shader_binary_formats > 0)
+		{
+			stats.m_shader_stats.m_shader_binary_formats.resize(stats.m_shader_stats.m_num_shader_binary_formats);
+			glGetIntegerv(GL_SHADER_BINARY_FORMATS, &(stats.m_shader_stats.m_shader_binary_formats[0]));
+		}
 	}
 #endif
 

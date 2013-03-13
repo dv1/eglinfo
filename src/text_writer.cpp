@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <iomanip>
 #include <cstring>
+#include <sstream>
 #include "text_writer.hpp"
 
 
@@ -170,6 +171,18 @@ void text_writer::write_main_egl_info(
 
 void text_writer::begin_write_egl_configs(EGLint const p_num_configs)
 {
+/*
+      (c) .. conformant
+      (n) .. non-conformant
+
+      #    ID  LEVEL  COLORBUFFER            ALPHA MASK  LUMINANCE  DEPTH  STENCIL  MULTISAMPLE      VISUAL         SURFACES    RENDERABLES                      TRANSPARENT    CAVEATS  PBUFFER                       SWAP INTERVAL  BIND TO TEX
+                      type size  r  g  b  a  size        size       size   size     samples buffers  type   id                  apis                     native  type  r  g  b           maxwidth maxheight maxpixels  min max        rgb rgba
+      0    25      0  rgb    24  8  8  8  0     0          0           0      0           0       0  0x0004 0x0021  win,pb,pix  gl(c),es(n),es2(c),vg(n) yes     none  0  0  0  none         4096      4096  19581000    0  10        yes yes
+      1    26      0  rgb    24  8  8  8  0     0          0           0      0           0       0  0x0004 0x0021  win,pb,pix  gl(c),es(n),es2(c)       yes     none  0  0  0  slow
+      2    31      0  rgb    24  8  8  8  0     0          0          24      0           0       0  0x0004 0x0021  win,pb,pix  gl(c),es(c),es2(n)       yes     none  0  0  0  nonconf
+
+*/
+
 	m_out << "   number of configurations: " << p_num_configs << "\n";
 	m_out << "\n";
 
@@ -280,6 +293,19 @@ void text_writer::write_main_glapi_info(
 }
 
 
+std::string print_named_gl_value(GLint const p_value, char const *p_string)
+{
+	if (p_string == 0)
+	{
+		std::stringstream sstr;
+		sstr << std::hex << "0x" << p_value;
+		return sstr.str();
+	}
+	else
+		return p_string;
+}
+
+
 void text_writer::write_glapi_stats(
 	  EGLenum const p_api
 	, char const *p_api_name
@@ -294,7 +320,22 @@ void text_writer::write_glapi_stats(
 		<< "    max renderbuffer size:            " << p_stats.m_main_stats.m_max_renderbuffer_size << "\n"
 		<< "    max combined texture image units: " << p_stats.m_main_stats.m_max_combined_texture_image_units << "\n"
 		<< "    num compressed texture formats:   " << p_stats.m_main_stats.m_num_compressed_texture_formats << "\n"
+		<< "    aliased line width range:         " << p_stats.m_main_stats.m_aliased_line_width_range[0] <<  ", " << p_stats.m_main_stats.m_aliased_line_width_range[1] << "\n"
+		<< "    aliased point size range:         " << p_stats.m_main_stats.m_aliased_point_size_range[0] <<  ", " << p_stats.m_main_stats.m_aliased_point_size_range[1] << "\n"
+		<< "    implementation color read format: " << print_named_gl_value(p_stats.m_main_stats.m_implementation_color_read_format, get_color_format_string(p_stats.m_main_stats.m_implementation_color_read_format)) << "\n"
+		<< "    implementation color read type:   " << print_named_gl_value(p_stats.m_main_stats.m_implementation_color_read_type, get_color_type_string(p_stats.m_main_stats.m_implementation_color_read_type)) << "\n"
+		<< "    max viewport dimensions:          " << p_stats.m_main_stats.m_max_viewport_dims[0] <<  ", " << p_stats.m_main_stats.m_max_viewport_dims[1] << "\n"
+		<< "    subpixel bits:                    " << p_stats.m_main_stats.m_subpixel_bits << "\n"
 		;
+
+	if (p_stats.m_main_stats.m_num_compressed_texture_formats > 0)
+	{
+		m_out << "    supported compressed texture formats:\n";
+		for (integers::const_iterator comptexfmt_iter = p_stats.m_main_stats.m_compressed_texture_formats.begin(); comptexfmt_iter != p_stats.m_main_stats.m_compressed_texture_formats.end(); ++comptexfmt_iter)
+		{
+			m_out << "      " << print_named_gl_value(*comptexfmt_iter, get_compressed_texture_format_string(*comptexfmt_iter)) << "\n";
+		}
+	}
 
 	if (p_stats.m_shader_capable)
 	{
@@ -306,7 +347,17 @@ void text_writer::write_glapi_stats(
 			<< "    max varying vectors:            " << p_stats.m_shader_stats.m_max_varying_vectors << "\n"
 			<< "    max vertex uniform vectors:     " << p_stats.m_shader_stats.m_max_vertex_uniform_vectors << "\n"
 			<< "    max fragment uniform vectors:   " << p_stats.m_shader_stats.m_max_fragment_uniform_vectors << "\n"
+			<< "    shader compiler:                " << yesno(p_stats.m_shader_stats.m_shader_compiler) << "\n"
 			;
+		if (p_stats.m_shader_stats.m_num_shader_binary_formats > 0)
+		{
+			m_out << "    supported shader binary formats:\n";
+			for (integers::const_iterator binfmt_iter = p_stats.m_shader_stats.m_shader_binary_formats.begin(); binfmt_iter != p_stats.m_shader_stats.m_shader_binary_formats.end(); ++binfmt_iter)
+			{
+				m_out << "      " << print_named_gl_value(*binfmt_iter, get_shader_binary_format_string(*binfmt_iter)) << "\n";
+			}
+		}
+
 	}
 }
 
