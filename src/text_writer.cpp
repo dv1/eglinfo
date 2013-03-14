@@ -327,7 +327,7 @@ std::string print_named_gl_value(GLint const p_value, char const *p_string)
 
 
 void text_writer::write_glapi_stats(
-	  EGLenum const p_api
+	  EGLenum const
 	, char const *p_api_name
 	, glapi_stats const &p_stats
 )

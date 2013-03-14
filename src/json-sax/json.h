@@ -46,7 +46,7 @@ typedef enum
 	JSON_KEY,
 	JSON_TRUE,
 	JSON_FALSE,
-	JSON_NULL,
+	JSON_NULL
 } json_type;
 
 typedef enum
@@ -77,7 +77,7 @@ typedef enum
 	/* callback returns error */
 	JSON_ERROR_CALLBACK,
 	/* utf8 stream is invalid */
-	JSON_ERROR_UTF8,
+	JSON_ERROR_UTF8
 } json_error;
 
 #define LIBJSON_DEFAULT_STACK_SIZE 256

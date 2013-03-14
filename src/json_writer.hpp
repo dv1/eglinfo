@@ -14,7 +14,7 @@ class json_writer:
 	public writer
 {
 public:
-	explicit json_writer(std::ostream &p_out);
+	explicit json_writer(std::ostream &p_out, bool const p_use_raw_print);
 	~json_writer();
 
 	virtual void begin_write();
@@ -76,9 +76,32 @@ public:
 
 
 private:
+	void json_print_base(int p_type, const char *p_data, uint32_t p_length);
+	void json_print_cstring(int const p_type, char const *p_string);
+	void json_print(bool const p_value);
+	void json_print(int const p_value);
+	void json_print(char const *p_string);
+	void json_print(std::string const &p_string);
+	void json_print(integers const &p_integers);
+	void json_print_key(char const *p_key);
+	void json_print_key(int const p_key);
+	void json_print_list(char const *p_list);
+	void json_print_keylist(char const *p_key, char const *p_list);
+	void json_print_keyarray(char const *p_key, EGLint const *p_array, int const p_size);
+
+
+	template < typename T >
+	void json_print_keyvalue(char const *p_key, T const &p_value)
+	{
+		json_print_key(p_key);
+		json_print(p_value);
+	}
+
+
 	std::ostream &m_out;
 	json_printer m_printer;
 	bool m_ok;
+	bool const m_use_raw_print;
 };
 
 

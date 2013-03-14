@@ -1,4 +1,6 @@
 #include <config.h>
+#include <unistd.h>
+#include <memory>
 
 #include "platform.hpp"
 
@@ -53,18 +55,86 @@ void write_info(eglinfo::writer &p_writer, eglinfo::egl_scope const &p_egl_scope
 }
 
 
+void print_usage(char const *arg0)
+{
+	std::cerr
+		<< "usage: " << arg0 << " [options]\n"
+		<< "\t-h        : this help\n"
+		<< "\t-w WRITER : use specified writer for output\n"
+		<< "\t            valid values are: json text\n"
+		<< "\t-d NAME   : output information for the native display with specified name\n"
+		<< "\t-r        : if using the JSON writer, do a raw print instead of a pretty one\n"
+		;
+}
+
+
 int main(int argc, char **argv)
 {
-	using namespace eglinfo;
+	std::string native_display_name;
+	typedef std::auto_ptr < eglinfo::writer > writer_ptr;
+	writer_ptr writer;
 
-	native_display d((argc > 1) ? argv[1] : reinterpret_cast <char*> (0));
-	if (!d.is_ok())
+	int opt;
+	std::string writer_type = "text";
+	bool json_raw_print = false;
+	while ((opt = getopt(argc, argv, "w:d:rh")) != -1)
+	{
+		switch (opt)
+		{
+			case 'w':
+			{
+				if (optarg == 0)
+				{
+					print_usage(argv[0]);
+					return -1;
+				}
+				writer_type = optarg;
+				break;
+			}
+			case 'd':
+			{
+				if (optarg == 0)
+				{
+					print_usage(argv[0]);
+					return -1;
+				}
+				native_display_name = optarg;
+				break;
+			}
+			case 'r':
+				json_raw_print = true;
+				break;
+			case 'h':
+				print_usage(argv[0]);
+				return 0;
+			default:
+				print_usage(argv[0]);
+				return -1;
+		}
+	}
+
+	if (writer_type == "json")
+		writer = writer_ptr(new eglinfo::json_writer(std::cout, json_raw_print));
+	else if (writer_type == "text")
+		writer = writer_ptr(new eglinfo::text_writer(std::cout));
+	else
+	{
+		std::cerr << "unknown writer '" << writer_type << "'\n";
+		std::cerr << "\n";
+		print_usage(argv[0]);
 		return -1;
+	}
 
-	egl_scope egl(d.get_egl_native_display());
+	eglinfo::native_display d(native_display_name.empty() ? reinterpret_cast < char const* > (0) : native_display_name.c_str());
+	if (!d.is_ok())
+	{
+		std::cerr << "could not initialize with native display " << native_display_name << "\n";
+		return -1;
+	}
 
-	eglinfo::json_writer writer(std::cout);
-	write_info(writer, egl);
+	eglinfo::egl_scope egl(d.get_egl_native_display());
+
+	write_info(*writer, egl);
 
 	return 0;
 }
