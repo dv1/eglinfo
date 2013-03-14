@@ -123,4 +123,16 @@
 #endif
 
 
+#ifndef GL_S3_s3tc
+#define GL_RGB_S3TC                                             0x83A0
+#define GL_RGB4_S3TC                                            0x83A1
+#define GL_RGBA_S3TC                                            0x83A2
+#define GL_RGBA4_S3TC                                           0x83A3
+#define GL_RGBA_DXT5_S3TC                                       0x83A4
+#define GL_RGBA4_DXT5_S3TC                                      0x83A5
+#define GL_S3_s3tc 1
+#endif
+
+
+
 #endif

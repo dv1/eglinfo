@@ -106,6 +106,13 @@ char const * get_compressed_texture_format_string(GLint const p_format)
 		case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_NV: return "COMPRESSED_SRGB_ALPHA_S3TC_DXT3_NV";
 		case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_NV: return "COMPRESSED_SRGB_ALPHA_S3TC_DXT5_NV";
 
+		case GL_RGB_S3TC: return "RGB_S3TC";
+		case GL_RGB4_S3TC: return "RGB4_S3TC";
+		case GL_RGBA_S3TC: return "RGBA_S3TC";
+		case GL_RGBA4_S3TC: return "RGBA4_S3TC";
+		case GL_RGBA_DXT5_S3TC: return "RGBA_DXT5_S3TC";
+		case GL_RGBA4_DXT5_S3TC: return "RGBA4_DXT5_S3TC";
+
 		default: return 0;
 	}
 }
