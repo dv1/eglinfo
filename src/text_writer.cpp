@@ -320,11 +320,11 @@ void text_writer::write_glapi_stats(
 		<< "    max renderbuffer size:            " << p_stats.m_main_stats.m_max_renderbuffer_size << "\n"
 		<< "    max combined texture image units: " << p_stats.m_main_stats.m_max_combined_texture_image_units << "\n"
 		<< "    num compressed texture formats:   " << p_stats.m_main_stats.m_num_compressed_texture_formats << "\n"
-		<< "    aliased line width range:         " << p_stats.m_main_stats.m_aliased_line_width_range[0] <<  ", " << p_stats.m_main_stats.m_aliased_line_width_range[1] << "\n"
-		<< "    aliased point size range:         " << p_stats.m_main_stats.m_aliased_point_size_range[0] <<  ", " << p_stats.m_main_stats.m_aliased_point_size_range[1] << "\n"
+		<< "    aliased line width range:         " << p_stats.m_main_stats.m_aliased_line_width_range[0] <<  " - " << p_stats.m_main_stats.m_aliased_line_width_range[1] << "\n"
+		<< "    aliased point size range:         " << p_stats.m_main_stats.m_aliased_point_size_range[0] <<  " - " << p_stats.m_main_stats.m_aliased_point_size_range[1] << "\n"
 		<< "    implementation color read format: " << print_named_gl_value(p_stats.m_main_stats.m_implementation_color_read_format, get_color_format_string(p_stats.m_main_stats.m_implementation_color_read_format)) << "\n"
 		<< "    implementation color read type:   " << print_named_gl_value(p_stats.m_main_stats.m_implementation_color_read_type, get_color_type_string(p_stats.m_main_stats.m_implementation_color_read_type)) << "\n"
-		<< "    max viewport dimensions:          " << p_stats.m_main_stats.m_max_viewport_dims[0] <<  ", " << p_stats.m_main_stats.m_max_viewport_dims[1] << "\n"
+		<< "    max viewport dimensions:          " << p_stats.m_main_stats.m_max_viewport_dims[0] <<  " x " << p_stats.m_main_stats.m_max_viewport_dims[1] << "\n"
 		<< "    subpixel bits:                    " << p_stats.m_main_stats.m_subpixel_bits << "\n"
 		;
 

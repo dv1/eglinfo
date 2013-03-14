@@ -1,4 +1,5 @@
 #include "glapi_stats.hpp"
+#include "compressed_texformats.hpp"
 
 
 namespace eglinfo
@@ -37,7 +38,6 @@ char const * get_compressed_texture_format_string(GLint const p_format)
 {
 	switch (p_format)
 	{
-#ifdef GL_KHR_texture_compression_astc_ldr
 		case GL_COMPRESSED_RGBA_ASTC_4x4_KHR: return "COMPRESSED_RGBA_ASTC_4x4_KHR";
 		case GL_COMPRESSED_RGBA_ASTC_5x4_KHR: return "COMPRESSED_RGBA_ASTC_5x4_KHR";
 		case GL_COMPRESSED_RGBA_ASTC_5x5_KHR: return "COMPRESSED_RGBA_ASTC_5x5_KHR";
@@ -66,13 +66,9 @@ char const * get_compressed_texture_format_string(GLint const p_format)
 		case GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR: return "COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR";
 		case GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR: return "COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR";
 		case GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR: return "COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR";
-#endif
 
-#ifdef GL_OES_compressed_ETC1_RGB8_texture
 		case GL_ETC1_RGB8_OES: return "ETC1_RGB8";
-#endif
 
-#ifdef GL_OES_compressed_paletted_texture
 		case GL_PALETTE4_RGB8_OES: return "PALETTE4_RGB8_OES";
 		case GL_PALETTE4_RGBA8_OES: return "PALETTE4_RGBA8_OES";
 		case GL_PALETTE4_R5_G6_B5_OES: return "PALETTE4_R5_G6_B5_OES";
@@ -83,25 +79,32 @@ char const * get_compressed_texture_format_string(GLint const p_format)
 		case GL_PALETTE8_R5_G6_B5_OES: return "PALETTE8_R5_G6_B5_OES";
 		case GL_PALETTE8_RGBA4_OES: return "PALETTE8_RGBA4_OES";
 		case GL_PALETTE8_RGB5_A1_OES: return "PALETTE8_RGB5_A1_OES";
-#endif
 
-#ifdef GL_AMD_compressed_3DC_texture
 		case GL_3DC_X_AMD: return "3DC_X_AMD";
 		case GL_3DC_XY_AMD: return "3DC_XY_AMD";
-#endif
 
-#ifdef GL_AMD_compressed_ATC_texture
 		case GL_ATC_RGB_AMD: return "ATC_RGB";
 		case GL_ATC_RGBA_EXPLICIT_ALPHA_AMD: return "ATC_RGBA_EXPLICIT_ALPHA_AMD";
 		case GL_ATC_RGBA_INTERPOLATED_ALPHA_AMD: return "ATC_RGBA_INTERPOLATED_ALPHA_AMD";
-#endif
 
-#ifdef GL_IMG_texture_compression_pvrtc
 		case GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG: return "COMPRESSED_RGB_PVRTC_4BPPV1_IMG";
 		case GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG: return "COMPRESSED_RGB_PVRTC_2BPPV1_IMG";
 		case GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG: return "COMPRESSED_RGBA_PVRTC_4BPPV1_IMG";
 		case GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG: return "COMPRESSED_RGBA_PVRTC_2BPPV1_IMG";
-#endif
+
+		case GL_COMPRESSED_RGBA_PVRTC_4BPPV2_IMG: return "COMPRESSED_RGBA_PVRTC_4BPPV2_IMG";
+		case GL_COMPRESSED_RGBA_PVRTC_2BPPV2_IMG: return "COMPRESSED_RGBA_PVRTC_2BPPV2_IMG";
+		
+		case GL_COMPRESSED_RGB_S3TC_DXT1_EXT: return "COMPRESSED_RGB_S3TC_DXT1_EXT";
+		case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT: return "COMPRESSED_RGBA_S3TC_DXT1_EXT";
+		
+		case GL_COMPRESSED_RGBA_S3TC_DXT3_ANGLE: return "COMPRESSED_RGBA_S3TC_DXT3_ANGLE";
+		case GL_COMPRESSED_RGBA_S3TC_DXT5_ANGLE: return "COMPRESSED_RGBA_S3TC_DXT5_ANGLE";
+		
+		case GL_COMPRESSED_SRGB_S3TC_DXT1_NV: return "COMPRESSED_SRGB_S3TC_DXT1_NV";
+		case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_NV: return "COMPRESSED_SRGB_ALPHA_S3TC_DXT1_NV";
+		case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_NV: return "COMPRESSED_SRGB_ALPHA_S3TC_DXT3_NV";
+		case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_NV: return "COMPRESSED_SRGB_ALPHA_S3TC_DXT5_NV";
 
 		default: return 0;
 	}
