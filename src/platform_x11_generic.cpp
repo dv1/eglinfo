@@ -61,18 +61,18 @@ native_display::native_display(char const *p_name)
 {
 	if (p_name == NULL)
 	{
-		std::cout << "Using default X11 display\n";
+		std::cerr << "Using default X11 display\n";
 		m_egl_native_display = XOpenDisplay(0);
 	}
 	else
 	{
-		std::cout << "Using X11 display " << p_name << "\n";
+		std::cerr << "Using X11 display " << p_name << "\n";
 		m_egl_native_display = XOpenDisplay(p_name);
 	}
 	if (m_egl_native_display == NULL)
 		std::cerr << "Could not open display\n";
 	else
-		std::cout << "\n";
+		std::cerr << "\n";
 }
 
 

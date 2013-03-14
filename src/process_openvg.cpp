@@ -87,8 +87,6 @@ image_format_accel_entry const image_format_accel_table[] =
 
 void process_vg_info(writer &p_vg_writer, egl_scope const &p_egl_scope)
 {
-	std::cout << "OpenVG information:\n";
-
 	EGLint attribs[] =
 	{
 		EGL_RENDERABLE_TYPE, EGL_OPENVG_BIT,
