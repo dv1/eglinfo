@@ -18,8 +18,12 @@ public:
 	virtual void begin_write();
 	virtual void end_write();
 	
+	virtual void begin_api(EGLenum const p_api, char const *p_api_name);
+	virtual void end_api();
 	virtual void next_api();
 
+	virtual void begin_egl_info();
+	virtual void end_egl_info();
 	virtual void write_main_egl_info(
 		  EGLint const p_major_version, EGLint const p_minor_version
 		, char const *p_vendor
@@ -78,5 +82,5 @@ private:
 } // namespace eglinfo end
 
 
-
 #endif
+

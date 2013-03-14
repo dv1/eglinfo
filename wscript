@@ -50,6 +50,7 @@ valid_devices = ['generic', 'imx6', 'beagleboard']
 
 
 def options(opt):
+	opt.load('compiler_c')
 	opt.load('compiler_cxx')
 	opt.add_option('--platform', action='store', default='', help='platform to build for (valid values: ' + ' '.join(valid_platforms) + ')')
 	opt.add_option('--device', action='store', default='generic', help='device to build for (valid values: ' + ' '.join(valid_devices) + ')')
@@ -199,6 +200,7 @@ def configure(conf):
 	except ValueError:
 		conf.fatal("Invalid device selected")
 
+	conf.load('compiler_c')
 	conf.load('compiler_cxx')
 
 	# check and add compiler flags
@@ -245,6 +247,7 @@ def build(bld):
 		"src/scopes.cpp", \
 		"src/text_writer.cpp", \
 		"src/glapi_stats.cpp", \
+		"src/json-sax/json.c", \
 	]
 	bld(
 		features = ['cxx', 'cxxprogram'],

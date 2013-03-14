@@ -140,9 +140,29 @@ void text_writer::end_write()
 }
 
 
+void text_writer::begin_api(EGLenum const, char const *)
+{
+}
+
+
+void text_writer::end_api()
+{
+}
+
+
 void text_writer::next_api()
 {
 	m_out << std::endl;
+}
+
+
+void text_writer::begin_egl_info()
+{
+}
+
+
+void text_writer::end_egl_info()
+{
 }
 
 

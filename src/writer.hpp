@@ -15,9 +15,13 @@ class writer
 public:
 	virtual void begin_write() = 0;
 	virtual void end_write() = 0;
-	
+
+	virtual void begin_api(EGLenum const p_api, char const *p_api_name) = 0;
+	virtual void end_api() = 0;
 	virtual void next_api() = 0;
 
+	virtual void begin_egl_info() = 0;
+	virtual void end_egl_info() = 0;
 	virtual void write_main_egl_info(
 		  EGLint const p_major_version, EGLint const p_minor_version
 		, char const *p_vendor
@@ -25,7 +29,6 @@ public:
 		, char const *p_client_APIs
 		, char const *p_extensions
 	) = 0;
-
 	virtual void begin_write_egl_configs(EGLint const p_num_configs) = 0;
 	virtual void write_egl_config(egl_config const &p_egl_config) = 0;
 	virtual void end_write_egl_configs() = 0;
