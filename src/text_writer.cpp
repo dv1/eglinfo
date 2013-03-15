@@ -357,7 +357,7 @@ void text_writer::write_glapi_stats(
 )
 {
 	m_out
-		<< "main " << p_api_name << " stats:\n"
+		<< "  main " << p_api_name << " stats:\n"
 		<< "    max texture size:                 " << p_stats.m_main_stats.m_max_texture_size << "\n"
 		<< "    max cubemap texture size:         " << p_stats.m_main_stats.m_max_cubemap_texture_size << "\n"
 		<< "    max texture image units:          " << p_stats.m_main_stats.m_max_texture_image_units << "\n"
@@ -384,7 +384,7 @@ void text_writer::write_glapi_stats(
 	if (p_stats.m_shader_capable)
 	{
 		m_out
-			<< "shader specific " << p_api_name << " stats:\n"
+			<< "  shader specific " << p_api_name << " stats:\n"
 			<< "    max vertex attribs:             " << p_stats.m_shader_stats.m_max_vertex_attribs << "\n"
 			<< "    max vertex texture image units: " << p_stats.m_shader_stats.m_max_vertex_texture_image_units << "\n"
 			<< "    num shader binary formats:      " << p_stats.m_shader_stats.m_num_shader_binary_formats << "\n"

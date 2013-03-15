@@ -46,7 +46,7 @@ def check_lib_list(conf, uselib, uselib_store, lib_list):
 
 
 valid_platforms = ['fb', 'x11']
-valid_devices = ['generic', 'imx6', 'beagleboard']
+valid_devices = ['generic', 'imx6', 'beagleboard', 'raspberrypi']
 
 
 def options(opt):
@@ -99,18 +99,19 @@ def check_opengl(conf, uselib = 'EGL'):
 # device specific configuration
 
 
-def check_vivante_egl(conf, egl_macro):
-	conf.check_cxx(mandatory = 1, lib = ['EGL', 'GAL'], uselib_store = 'EGL')
-	old_cxxflags = list(conf.env['CXXFLAGS'])
-	extra_cxxflags = ['-DLINUX']
-	if egl_macro:
-		extra_cxxflags += ['-D%s' % egl_macro]
-	conf.env['CXXFLAGS'] += extra_cxxflags
-	conf.check_cxx(mandatory = 1, header_name = 'EGL/eglvivante.h', uselib_store = 'EGL')
+def configure_raspberrypi_device(conf, platform):
+	conf.env['PLATFORM_USELIBS'] = ['GLES2', 'EGL']
+	if platform == "x11":
+		check_x11(conf)
+		conf.env['PLATFORM_SOURCE'] = ['src/platform_x11_generic.cpp']
+		conf.env['PLATFORM_USELIBS'] += ["X11"]
+	elif platform == "fb":
+		conf.env['PLATFORM_SOURCE'] = ['src/platform_fb_raspberrypi.cpp']
+	conf.check_cxx(mandatory = 1, lib = ['EGL', 'bcm_host'], uselib_store = 'EGL')
 	conf.check_cxx(mandatory = 1, header_name = 'EGL/egl.h', uselib_store = 'EGL')
-	conf.env['CXXFLAGS_EGL'] += extra_cxxflags
-	conf.env['CXXFLAGS'] = old_cxxflags
-	conf.define('WITH_VIVANTE_EGL', 1)
+	conf.check_cxx(mandatory = 1, header_name = 'bcm_host.h', uselib_store = 'EGL')
+	check_gles2(conf)
+	conf.env['WITH_APIS'] = ['GLES1', 'GLES2', 'OPENGL']
 
 
 def configure_beagleboard_device(conf, platform):
@@ -128,6 +129,18 @@ def configure_beagleboard_device(conf, platform):
 	conf.env['WITH_APIS'] = ['GLES1', 'GLES2', 'OPENVG', 'OPENGL']
 
 
+def check_vivante_egl(conf, egl_macro):
+	conf.check_cxx(mandatory = 1, lib = ['EGL', 'GAL'], uselib_store = 'EGL')
+	old_cxxflags = list(conf.env['CXXFLAGS'])
+	extra_cxxflags = ['-DLINUX']
+	if egl_macro:
+		extra_cxxflags += ['-D%s' % egl_macro]
+	conf.env['CXXFLAGS'] += extra_cxxflags
+	conf.check_cxx(mandatory = 1, header_name = 'EGL/eglvivante.h', uselib_store = 'EGL')
+	conf.check_cxx(mandatory = 1, header_name = 'EGL/egl.h', uselib_store = 'EGL')
+	conf.env['CXXFLAGS_EGL'] += extra_cxxflags
+	conf.env['CXXFLAGS'] = old_cxxflags
+	conf.define('WITH_VIVANTE_EGL', 1)
 def configure_imx6_device(conf, platform):
 	conf.env['PLATFORM_USELIBS'] = ['GLES2', 'OPENVG', 'EGL']
 	conf.env['WITH_APIS'] = ['GLES1', 'GLES2', 'OPENVG']
@@ -212,12 +225,12 @@ def configure(conf):
 		check_compiler_flags_2(conf, '', conf.env['LINKFLAGS'], "Testing linker flags %s" % ' '.join(conf.env['LINKFLAGS']))
 
 	# device specifics
-	if conf.options.device == "beagleboard":
-		configure_beagleboard_device(conf, conf.options.platform)
-	elif conf.options.device == "imx6":
-		configure_imx6_device(conf, conf.options.platform)
-	elif conf.options.device == "generic":
-		configure_generic_device(conf, conf.options.platform)
+	device_conf_func_name = "configure_%s_device" % conf.options.device
+	try:
+		device_conf_func = globals()[device_conf_func_name]
+		device_conf_func(conf, conf.options.platform)
+	except KeyError:
+		conf.fatal("Failed to call function '%s'" % device_conf_func_name)
 
 	for api in conf.env['WITH_APIS']:
 		conf.env['WITH_' + api] = True
