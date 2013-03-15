@@ -10,7 +10,6 @@ native_window::native_window(EGLNativeDisplayType const &p_egl_native_display, E
 	: m_egl_native_display(p_egl_native_display)
 {
 	m_egl_native_window = fbCreateWindow(m_egl_native_display, 0, 0, 0, 0);
-	// TODO: error checking
 }
 
 
@@ -29,7 +28,6 @@ native_display::native_display(char const *p_name)
 	}
 
 	m_egl_native_display = fbGetDisplayByIndex(display_index);
-	// TODO: error checking
 }
 
 

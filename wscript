@@ -211,12 +211,6 @@ def configure(conf):
 	elif conf.env['LINKFLAGS']:
 		check_compiler_flags_2(conf, '', conf.env['LINKFLAGS'], "Testing linker flags %s" % ' '.join(conf.env['LINKFLAGS']))
 
-	compiler_flags = ['-Wextra', '-Wall', '-std=c++98', '-pedantic']
-#	compiler_flags += ['-O2', '-s']
-	compiler_flags += ['-O0', '-g3', '-ggdb']
-
-	add_compiler_flags(conf, conf.env, compiler_flags, 'CXX', 'CXX')
-
 	# device specifics
 	if conf.options.device == "beagleboard":
 		configure_beagleboard_device(conf, conf.options.platform)
@@ -236,6 +230,21 @@ def configure(conf):
 
 	conf.write_config_header()
 
+	compiler_flags = ['-Wextra', '-Wall', '-std=c++98', '-pedantic']
+	add_compiler_flags(conf, conf.env, compiler_flags, 'C', 'CC')
+	add_compiler_flags(conf, conf.env, compiler_flags, 'CXX', 'CXX')
+
+	variants_flags = [
+		{'name':'debug', 'flags':['-O0', '-g3', '-ggdb']},
+		{'name':'release', 'flags':['-O2', '-s']},
+	]
+
+	original_env = conf.env
+	for variant_flags in variants_flags:
+		conf.setenv(variant_flags['name'], env = original_env.derive())
+                add_compiler_flags(conf, conf.env, variant_flags['flags'], 'C', 'CC')
+                add_compiler_flags(conf, conf.env, variant_flags['flags'], 'CXX', 'CXX')
+
 
 def build(bld):
 	source = [ \
@@ -252,8 +261,28 @@ def build(bld):
 	bld(
 		features = ['cxx', 'cxxprogram'],
 		uselib = bld.env['PLATFORM_USELIBS'],
-		includes = ['.', 'src'],
+		includes = ['.', '..', 'src'],
 		target = executable_name,
 		source = source + bld.env['PLATFORM_SOURCE']
 	)
+
+
+def init(ctx):
+	from waflib.Build import BuildContext, CleanContext, InstallContext, UninstallContext
+
+	for x in 'debug release'.split():
+		for y in (BuildContext, CleanContext, InstallContext, UninstallContext):
+			name = y.__name__.replace('Context','').lower()
+			class tmp(y):
+				cmd = name + '_' + x
+				variant = x
+
+	def buildall(ctx):
+		import waflib.Options
+		for x in ['debug', 'release']:
+			waflib.Options.commands.insert(0, x)
+
+	for y in (BuildContext, CleanContext, InstallContext, UninstallContext):
+		class tmp(y):
+			variant = 'release'
 

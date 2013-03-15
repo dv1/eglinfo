@@ -13,9 +13,20 @@ namespace
 {
 
 
+void fill_string(std::string &p_str, char const p_fillchar, std::string::size_type const p_padding)
+{
+	if (p_str.length() < p_padding)
+	{
+		std::string::size_type oldlen = p_str.length();
+		p_str.resize(p_padding);
+		std::fill(p_str.begin() + oldlen, p_str.end(), p_fillchar);
+	}
+}
+
+
 char const * yesno(bool const b)
 {
-	return b ? "yes" : "no";
+	return b ? "yes" : "no ";
 }
 
 
@@ -63,9 +74,9 @@ char const * get_transparent_type_str(EGLint const p_transparent_type)
 {
 	switch (p_transparent_type)
 	{
-		case EGL_TRANSPARENT_RGB: return "rgb"; break;
+		case EGL_TRANSPARENT_RGB: return "rgb "; break;
 		case EGL_NONE: return "none"; break;
-		default: return "???";
+		default: return "??? ";
 	}
 }
 
@@ -83,12 +94,7 @@ void print_surfaces(std::ostream &p_out, EGLint const p_surfaces, std::string::s
 	if (!str.empty())
 		str.resize(str.length() - 1);
 
-	if (str.length() < p_padding)
-	{
-		std::string::size_type oldlen = str.length();
-		str.resize(p_padding);
-		std::fill(str.begin() + oldlen, str.end(), ' ');
-	}
+	fill_string(str, ' ', p_padding);
 
 	p_out << str;
 }
@@ -109,12 +115,26 @@ void print_renderables(std::ostream &p_out, EGLint const p_renderables, std::str
 	if (!str.empty())
 		str.resize(str.length() - 1);
 
-	if (str.length() < p_padding)
+	fill_string(str, ' ', p_padding);
+
+	p_out << str;
+}
+
+
+void print_caveat(std::ostream &p_out, EGLint const p_caveat, std::string::size_type const p_padding)
+{
+	std::string str;
+	p_out << std::setw(p_padding);
+	switch (p_caveat)
 	{
-		std::string::size_type oldlen = str.length();
-		str.resize(p_padding);
-		std::fill(str.begin() + oldlen, str.end(), ' ');
+		case EGL_NONE: str = "none"; break;
+		case EGL_DONT_CARE: str = "dontcare"; break;
+		case EGL_SLOW_CONFIG: str = "slow"; break;
+		case EGL_NON_CONFORMANT_CONFIG: str = "nonconfmt"; break;
+		default: str = "???"; break;
 	}
+
+	fill_string(str, ' ', p_padding);
 
 	p_out << str;
 }
@@ -206,8 +226,8 @@ void text_writer::begin_write_egl_configs(EGLint const p_num_configs)
 	m_out << "   number of configurations: " << p_num_configs << "\n";
 	m_out << "\n";
 
-	m_out << "      #      ID   LEVEL   COLORBUFFER             DEPTH   STENCIL   MULTISAMPLE       VISUAL          SURFACES     RENDERABLES           TRANSPARENT\n";
-	m_out << "                          type size  r  g  b  a   size    size      samples buffers   type   id                    apis         native   type  r  g  b\n";
+	m_out << "      #      ID  LEVEL  COLORBUFFER..........  DEPTH  STENCIL  MULTISAMPLE....  VISUAL.......  SURFACES..  RENDERABLES..........  TRANSPARENT..  CAVEAT...\n";
+	m_out << "                        type size  r  g  b  a  size   size     samples buffers  type   id                  apis           native  type  r  g  b           \n";
 }
 
 
@@ -219,13 +239,13 @@ void text_writer::write_egl_config(egl_config const &p_egl_config)
 
 	m_out << std::setw(8) << p_egl_config.m_id;
 
-	m_out << "   ";
+	m_out << "  ";
 
 	m_out << std::setw(5) << p_egl_config.m_level;
 
-	m_out << "   ";
+	m_out << "  ";
 
-	m_out << std::setw(4) << get_colorbuf_type_str(p_egl_config.m_colorbuf_type);
+	m_out << get_colorbuf_type_str(p_egl_config.m_colorbuf_type) << ' ';
 	m_out << " ";
 	m_out << std::setw(4) << p_egl_config.m_colorbuf_size;
 	m_out << " ";
@@ -237,46 +257,50 @@ void text_writer::write_egl_config(egl_config const &p_egl_config)
 	m_out << " ";
 	m_out << std::setw(2) << p_egl_config.m_colorbuf_rgba[3];
 
+	m_out << "  ";
+
+	m_out << std::setw(4) << p_egl_config.m_depth_size;
+
+	m_out << "  ";
+
+	m_out << std::setw(5) << p_egl_config.m_stencil_size;
 	m_out << "   ";
 
-	m_out << std::setw(5) << p_egl_config.m_depth_size;
-
-	m_out << "   ";
-
-	m_out << std::setw(7) << p_egl_config.m_stencil_size;
-
-	m_out << "   ";
+	m_out << "  ";
 
 	m_out << std::setw(7) << p_egl_config.m_multisample_samples;
 	m_out << " ";
 	m_out << std::setw(7) << p_egl_config.m_multisample_buffers;
 
-	m_out << "   ";
+	m_out << "  ";
 
 	m_out << "0x" << std::hex << std::setw(4) << std::setfill('0') << p_egl_config.m_visual_type;
 	m_out << " ";
 	m_out << "0x" << std::hex << std::setw(4) << std::setfill('0') << p_egl_config.m_visual_id;
 	m_out << std::dec << std::setfill(' ');
 
-	m_out << "   ";
+	m_out << "  ";
 
 	print_surfaces(m_out, p_egl_config.m_surfaces, 10);
 
-	m_out << "   ";
+	m_out << "  ";
 
 	print_renderables(m_out, p_egl_config.m_renderables, 12);
-	m_out << " ";
-	m_out << std::setw(6) << yesno(p_egl_config.m_native_renderable);
-
 	m_out << "   ";
+	m_out << yesno(p_egl_config.m_native_renderable) << "   ";
 
-	m_out << std::setw(4) << get_transparent_type_str(p_egl_config.m_transparent_type);
+	m_out << "  ";
+
+	m_out << get_transparent_type_str(p_egl_config.m_transparent_type);
 	m_out << " ";
 	m_out << std::setw(2) << p_egl_config.m_transparent_rgb[0];
 	m_out << " ";
 	m_out << std::setw(2) << p_egl_config.m_transparent_rgb[1];
 	m_out << " ";
 	m_out << std::setw(2) << p_egl_config.m_transparent_rgb[2];
+
+	m_out << "  ";
+	print_caveat(m_out, p_egl_config.m_caveat, 9);
 
 	m_out << "\n";
 }
