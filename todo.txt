@@ -1,0 +1,3 @@
+* cleanup (especially in the json writer; try to use generic programming to simplify and streamline the code)
+* add support for more platforms
+* test the raspberrypi and beagleboard platform code

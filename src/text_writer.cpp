@@ -100,17 +100,33 @@ void print_surfaces(std::ostream &p_out, EGLint const p_surfaces, std::string::s
 }
 
 
-void print_renderables(std::ostream &p_out, EGLint const p_renderables, std::string::size_type const p_padding)
+void print_renderables(std::ostream &p_out, EGLint const p_renderables, EGLint const p_conformance, std::string::size_type const p_padding)
 {
 	std::string str;
 	if (p_renderables & EGL_OPENGL_BIT)
-		str += "gl,";
+	{
+		str += "gl";
+		str += (p_conformance & EGL_OPENGL_BIT) ? "(c)" : "(n)";
+		str += ",";
+	}
 	if (p_renderables & EGL_OPENGL_ES_BIT)
-		str += "es,";
+	{
+		str += "es";
+		str += (p_conformance & EGL_OPENGL_ES_BIT) ? "(c)" : "(n)";
+		str += ",";
+	}
 	if (p_renderables & EGL_OPENGL_ES2_BIT)
-		str += "es2,";
+	{
+		str += "es2";
+		str += (p_conformance & EGL_OPENGL_ES2_BIT) ? "(c)" : "(n)";
+		str += ",";
+	}
 	if (p_renderables & EGL_OPENVG_BIT)
-		str += "vg,";
+	{
+		str += "vg";
+		str += (p_conformance & EGL_OPENVG_BIT) ? "(c)" : "(n)";
+		str += ",";
+	}
 
 	if (!str.empty())
 		str.resize(str.length() - 1);
@@ -211,23 +227,11 @@ void text_writer::write_main_egl_info(
 
 void text_writer::begin_write_egl_configs(EGLint const p_num_configs)
 {
-/*
-      (c) .. conformant
-      (n) .. non-conformant
-
-      #    ID  LEVEL  COLORBUFFER            ALPHA MASK  LUMINANCE  DEPTH  STENCIL  MULTISAMPLE      VISUAL         SURFACES    RENDERABLES                      TRANSPARENT    CAVEATS  PBUFFER                       SWAP INTERVAL  BIND TO TEX
-                      type size  r  g  b  a  size        size       size   size     samples buffers  type   id                  apis                     native  type  r  g  b           maxwidth maxheight maxpixels  min max        rgb rgba
-      0    25      0  rgb    24  8  8  8  0     0          0           0      0           0       0  0x0004 0x0021  win,pb,pix  gl(c),es(n),es2(c),vg(n) yes     none  0  0  0  none         4096      4096  19581000    0  10        yes yes
-      1    26      0  rgb    24  8  8  8  0     0          0           0      0           0       0  0x0004 0x0021  win,pb,pix  gl(c),es(n),es2(c)       yes     none  0  0  0  slow
-      2    31      0  rgb    24  8  8  8  0     0          0          24      0           0       0  0x0004 0x0021  win,pb,pix  gl(c),es(c),es2(n)       yes     none  0  0  0  nonconf
-
-*/
-
 	m_out << "   number of configurations: " << p_num_configs << "\n";
 	m_out << "\n";
 
-	m_out << "      #      ID  LEVEL  COLORBUFFER..........  DEPTH  STENCIL  MULTISAMPLE....  VISUAL.......  SURFACES..  RENDERABLES..........  TRANSPARENT..  CAVEAT...\n";
-	m_out << "                        type size  r  g  b  a  size   size     samples buffers  type   id                  apis           native  type  r  g  b           \n";
+	m_out << "      #      ID  LEVEL  COLORBUFFER..........  DEPTH  STENCIL  MULTISAMPLE....  VISUAL.......  SURFACES..  RENDERABLES......................  TRANSPARENT..  CAVEAT...\n";
+	m_out << "                        type size  r  g  b  a  size   size     samples buffers  type   id                  apis                       native  type  r  g  b           \n";
 }
 
 
@@ -285,7 +289,7 @@ void text_writer::write_egl_config(egl_config const &p_egl_config)
 
 	m_out << "  ";
 
-	print_renderables(m_out, p_egl_config.m_renderables, 12);
+	print_renderables(m_out, p_egl_config.m_renderables, p_egl_config.m_conformance, 24);
 	m_out << "   ";
 	m_out << yesno(p_egl_config.m_native_renderable) << "   ";
 
@@ -352,12 +356,12 @@ std::string print_named_gl_value(GLint const p_value, char const *p_string)
 
 void text_writer::write_glapi_stats(
 	  EGLenum const
-	, char const *p_api_name
+	, char const *
 	, glapi_stats const &p_stats
 )
 {
 	m_out
-		<< "  main " << p_api_name << " stats:\n"
+		<< "  main stats:\n"
 		<< "    max texture size:                 " << p_stats.m_main_stats.m_max_texture_size << "\n"
 		<< "    max cubemap texture size:         " << p_stats.m_main_stats.m_max_cubemap_texture_size << "\n"
 		<< "    max texture image units:          " << p_stats.m_main_stats.m_max_texture_image_units << "\n"
@@ -384,7 +388,7 @@ void text_writer::write_glapi_stats(
 	if (p_stats.m_shader_capable)
 	{
 		m_out
-			<< "  shader specific " << p_api_name << " stats:\n"
+			<< "  shader specific stats:\n"
 			<< "    max vertex attribs:             " << p_stats.m_shader_stats.m_max_vertex_attribs << "\n"
 			<< "    max vertex texture image units: " << p_stats.m_shader_stats.m_max_vertex_texture_image_units << "\n"
 			<< "    num shader binary formats:      " << p_stats.m_shader_stats.m_num_shader_binary_formats << "\n"
