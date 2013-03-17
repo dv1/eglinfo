@@ -55,7 +55,7 @@ native_window::native_window(native_display const &p_native_display, EGLint cons
 native_window::~native_window()
 {
 	if (m_egl_native_window)
-		XDestroyWindow(p_native_display.get_egl_native_display(), m_egl_native_window);
+		XDestroyWindow(m_native_display.get_egl_native_display(), m_egl_native_window);
 }
 
 
