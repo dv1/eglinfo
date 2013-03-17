@@ -78,7 +78,7 @@ bool process_glapi_info(
 	}
 
 
-	native_window window(p_egl_scope.get_egl_native_display(), vid);
+	native_window window(p_egl_scope.get_native_display(), vid);
 
 	eglBindAPI(p_api);
 

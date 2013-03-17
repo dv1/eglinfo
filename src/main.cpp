@@ -132,7 +132,7 @@ int main(int argc, char **argv)
 		return -1;
 	}
 
-	eglinfo::egl_scope egl(d.get_egl_native_display());
+	eglinfo::egl_scope egl(d);
 
 	write_info(*writer, egl);
 

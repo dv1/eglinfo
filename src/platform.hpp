@@ -8,10 +8,13 @@ namespace eglinfo
 {
 
 
+class native_display;
+
+
 class native_window
 {
 public:
-	native_window(EGLNativeDisplayType const &p_egl_native_display, EGLint const p_visual_id);
+	native_window(native_display const &p_native_display, EGLint const p_visual_id);
 	~native_window();
 
 
@@ -28,6 +31,8 @@ public:
 
 
 private:
+	native_display const &m_native_display;
+
 	EGLNativeDisplayType m_egl_native_display;
 	EGLNativeWindowType m_egl_native_window;
 
@@ -39,6 +44,8 @@ private:
 class native_display
 {
 public:
+	struct internals;
+
 	explicit native_display(char const *p_name);
 	~native_display();
 
@@ -49,10 +56,14 @@ public:
 
 	bool is_ok() const;
 
+	internals* get_internals() const
+	{
+		return m_internals;
+	}
+
 private:
 	EGLNativeDisplayType m_egl_native_display;
 
-	struct internals;
 	internals *m_internals;
 };
 

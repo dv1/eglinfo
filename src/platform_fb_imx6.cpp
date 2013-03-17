@@ -6,10 +6,10 @@ namespace eglinfo
 {
 
 
-native_window::native_window(EGLNativeDisplayType const &p_egl_native_display, EGLint const p_visual_id)
-	: m_egl_native_display(p_egl_native_display)
+native_window::native_window(native_display const &p_native_display, EGLint const p_visual_id)
+	: m_native_display(p_native_display)
 {
-	m_egl_native_window = fbCreateWindow(m_egl_native_display, 0, 0, 0, 0);
+	m_egl_native_window = fbCreateWindow(p_native_display.get_egl_native_display(), 0, 0, 0, 0);
 }
 
 

@@ -6,17 +6,19 @@ namespace eglinfo
 {
 
 
-native_window::native_window(EGLNativeDisplayType const &p_egl_native_display, EGLint const p_visual_id)
-	: m_egl_native_display(p_egl_native_display)
+native_window::native_window(native_display const &p_native_display, EGLint const p_visual_id)
+	: m_native_display(p_native_display)
 	, m_egl_native_window(0)
 {
-	int screen_num = DefaultScreen(p_egl_native_display);
-	Window root_window = RootWindow(p_egl_native_display, screen_num);
+	EGLNativeDisplayType egl_native_display = p_native_display.get_egl_native_display();
+
+	int screen_num = DefaultScreen(egl_native_display);
+	Window root_window = RootWindow(egl_native_display, screen_num);
 
 	XVisualInfo visual_info_template, *visual_info;
 	int num_visuals;
 	visual_info_template.visualid = p_visual_id;
-	visual_info = XGetVisualInfo(p_egl_native_display, VisualIDMask, &visual_info_template, &num_visuals);
+	visual_info = XGetVisualInfo(egl_native_display, VisualIDMask, &visual_info_template, &num_visuals);
 
 	if (!visual_info)
 	{
@@ -28,10 +30,10 @@ native_window::native_window(EGLNativeDisplayType const &p_egl_native_display, E
 	unsigned long mask;
 	attr.background_pixel = 0;
 	attr.border_pixel = 0;
-	attr.colormap = XCreateColormap(p_egl_native_display, root_window, visual_info->visual, AllocNone);
+	attr.colormap = XCreateColormap(egl_native_display, root_window, visual_info->visual, AllocNone);
 	attr.event_mask = StructureNotifyMask | ExposureMask | KeyPressMask;
 	mask = CWBackPixel | CWBorderPixel | CWColormap | CWEventMask;
-	m_egl_native_window = XCreateWindow(p_egl_native_display, root_window, 0, 0, 400, 300,
+	m_egl_native_window = XCreateWindow(egl_native_display, root_window, 0, 0, 400, 300,
 			    0, visual_info->depth, InputOutput,
 			    visual_info->visual, mask, &attr);
 
@@ -42,8 +44,8 @@ native_window::native_window(EGLNativeDisplayType const &p_egl_native_display, E
 		sizehints.width  = 400;
 		sizehints.height = 300;
 		sizehints.flags = USSize | USPosition;
-		XSetNormalHints(p_egl_native_display, m_egl_native_window, &sizehints);
-		XSetStandardProperties(p_egl_native_display, m_egl_native_window, "eglinfo_testwindow", "eglinfo_testwindow", None, (char **)NULL, 0, &sizehints);
+		XSetNormalHints(egl_native_display, m_egl_native_window, &sizehints);
+		XSetStandardProperties(egl_native_display, m_egl_native_window, "eglinfo_testwindow", "eglinfo_testwindow", None, (char **)NULL, 0, &sizehints);
 	}
 
 	XFree(visual_info);
@@ -53,7 +55,7 @@ native_window::native_window(EGLNativeDisplayType const &p_egl_native_display, E
 native_window::~native_window()
 {
 	if (m_egl_native_window)
-		XDestroyWindow(m_egl_native_display, m_egl_native_window);
+		XDestroyWindow(p_native_display.get_egl_native_display(), m_egl_native_window);
 }
 
 

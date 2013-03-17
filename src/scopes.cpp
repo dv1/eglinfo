@@ -6,10 +6,10 @@ namespace eglinfo
 {
 
 
-egl_scope::egl_scope(EGLNativeDisplayType const &p_egl_native_display)
-	: m_egl_native_display(p_egl_native_display)
+egl_scope::egl_scope(native_display const &p_native_display)
+	: m_native_display(p_native_display)
 {
-	m_display = eglGetDisplay(p_egl_native_display);
+	m_display = eglGetDisplay(p_native_display.get_egl_native_display());
 	if (m_display == EGL_NO_DISPLAY)
 	{
 		PRINT_EGL_ERROR("Could not obtain EGL display");
@@ -38,9 +38,9 @@ egl_scope::operator bool() const
 	return m_display != EGL_NO_DISPLAY;
 }
 
-EGLNativeDisplayType const & egl_scope::get_egl_native_display() const
+native_display const & egl_scope::get_native_display() const
 {
-	return m_egl_native_display;
+	return m_native_display;
 }
 
 EGLDisplay const & egl_scope::get_display() const

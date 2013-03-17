@@ -2,6 +2,7 @@
 #define EGLINFO_SCOPED_RESOURCES_HPP
 
 #include <EGL/egl.h>
+#include "platform.hpp"
 
 
 namespace eglinfo
@@ -11,19 +12,19 @@ namespace eglinfo
 class egl_scope
 {
 public:
-	explicit egl_scope(EGLNativeDisplayType const &p_egl_native_display);
+	explicit egl_scope(native_display const &p_native_display);
 	~egl_scope();
 
 	operator bool() const;
 
-	EGLNativeDisplayType const & get_egl_native_display() const;
+	native_display const & get_native_display() const;
 	EGLDisplay const & get_display() const;
 
 	EGLint get_major_version() const;
 	EGLint get_minor_version() const;
 
 private:
-	EGLNativeDisplayType m_egl_native_display;
+	native_display const &m_native_display;
 	EGLDisplay m_display;
 	EGLint m_major_version, m_minor_version;
 };
