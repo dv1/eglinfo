@@ -55,7 +55,7 @@ enum classes {
 	C_OTHER, /* all other */
 	C_STAR, /* star in C style comment */
 	C_HASH, /* # for YAML comment */
-	C_ERROR = 0xfe,
+	C_ERROR = 0xfe
 };
 
 /* map from character < 128 to classes. from 128 to 256 all C_OTHER */
@@ -118,7 +118,7 @@ enum states {
 	STATE_N1, STATE_N2, STATE_N3, /* null constant states */
 	STATE_C1, STATE_C2, STATE_C3, /* C-comment states */
 	STATE_Y1, /* YAML-comment state */
-	STATE_D1, STATE_D2, /* multi unicode states */
+	STATE_D1, STATE_D2 /* multi unicode states */
 };
 
 /* the following are actions that need to be taken */
@@ -141,7 +141,7 @@ enum actions {
 	STATE_MX, /* integer detected by minus */
 	STATE_ZX, /* integer detected by zero */
 	STATE_IX, /* integer detected by 1-9 */
-	STATE_UC, /* Unicode character read */
+	STATE_UC  /* Unicode character read */
 };
 
 /* error state */
@@ -352,7 +352,7 @@ static int buffer_grow(json_parser *parser)
 {
 	uint32_t newsize;
 	void *ptr;
-	int max = parser->config.max_data;
+	uint32_t max = parser->config.max_data;
 
 	if (max > 0 && parser->buffer_size == max)
 		return JSON_ERROR_DATA_LIMIT;
@@ -372,7 +372,7 @@ static int buffer_push(json_parser *parser, unsigned char c)
 {
 	int ret;
 
-	if (parser->buffer_offset + 1 >= parser->buffer_size) {
+	if ((parser->buffer_offset + 1) >= parser->buffer_size) {
 		ret = buffer_grow(parser);
 		if (ret)
 			return ret;
@@ -789,6 +789,7 @@ int json_print_init(json_printer *printer, json_printer_callback callback, void 
  * doesn't do anything now, but in future print_init could allocate memory */
 int json_print_free(json_printer *printer)
 {
+	printer = printer; /* shuts up compiler warning */
 	return 0;
 }
 
