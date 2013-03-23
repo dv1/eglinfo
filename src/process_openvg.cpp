@@ -112,7 +112,7 @@ void process_vg_info(writer &p_vg_writer, egl_scope const &p_egl_scope)
 	}
 
 
-	native_window window(p_egl_scope.get_egl_native_display(), vid);
+	native_window window(p_egl_scope.get_native_display(), vid);
 
 	eglBindAPI(EGL_OPENVG_API);
 
