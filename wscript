@@ -219,14 +219,6 @@ def configure(conf):
 	conf.load('compiler_c')
 	conf.load('compiler_cxx')
 
-	# check and add compiler flags
-	if conf.env['CXXFLAGS'] and conf.env['LINKFLAGS']:
-		check_compiler_flags_2(conf, conf.env['CXXFLAGS'], conf.env['LINKFLAGS'], "Testing compiler flags %s and linker flags %s" % (' '.join(conf.env['CXXFLAGS']), ' '.join(conf.env['LINKFLAGS'])))
-	elif conf.env['CXXFLAGS']:
-		check_compiler_flags_2(conf, conf.env['CXXFLAGS'], '', "Testing compiler flags %s" % ' '.join(conf.env['CXXFLAGS']))
-	elif conf.env['LINKFLAGS']:
-		check_compiler_flags_2(conf, '', conf.env['LINKFLAGS'], "Testing linker flags %s" % ' '.join(conf.env['LINKFLAGS']))
-
 	# device specifics
 	device_conf_func_name = "configure_%s_device" % conf.options.device
 	try:
@@ -246,9 +238,8 @@ def configure(conf):
 
 	conf.write_config_header()
 
-	compiler_flags = ['-Wextra', '-Wall', '-std=c++98', '-pedantic']
-	add_compiler_flags(conf, conf.env, compiler_flags, 'C', 'CC')
-	add_compiler_flags(conf, conf.env, compiler_flags, 'CXX', 'CXX')
+	add_compiler_flags(conf, conf.env, ['-Wextra', '-Wall', '-std=c99', '-pedantic'], 'C', 'CC')
+	add_compiler_flags(conf, conf.env, ['-Wextra', '-Wall', '-std=c++98', '-pedantic'], 'CXX', 'CXX')
 
 	variants_flags = [
 		{'name':'debug', 'flags':['-O0', '-g3', '-ggdb']},
