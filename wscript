@@ -178,8 +178,8 @@ def configure_generic_device(conf, platform):
 		conf.env['WITH_APIS'] += ['OPENVG']
 		conf.env['PLATFORM_USELIBS'] += ['OPENVG']
 
-	with_gles1 = check_gles1(conf)
-	with_gles2 = check_gles2(conf)
+	with_gles1 = check_gles1(conf, lib_list = ['GLESv1_CM', 'GLESV1_CL', 'GLES_CM', 'GLES_CL'])
+	with_gles2 = check_gles2(conf, lib_list = ['GLESv2', 'GLESv2x', 'GLESv2SC'])
 	with_opengl = check_opengl(conf)
 
 	gluselib = None
