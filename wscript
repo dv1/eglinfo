@@ -107,9 +107,6 @@ def configure_raspberrypi_device(conf, platform):
 		conf.env['PLATFORM_USELIBS'] += ["X11"]
 	elif platform == "fb":
 		conf.env['PLATFORM_SOURCE'] = ['src/platform_fb_raspberrypi.cpp']
-	#compiler_flags = ['-marm', '-mfpu=vfp', '-mtune=arm1176jzf-s', '-march=armv6zk', '-mabi=aapcs-linux']
-	#add_compiler_flags(conf, conf.env, compiler_flags, 'C', 'CC')
-	#add_compiler_flags(conf, conf.env, compiler_flags, 'CXX', 'CXX')
 	conf.check_cxx(mandatory = 1, lib = ['GLESv2', 'EGL', 'bcm_host'], uselib_store = 'EGL')
 	conf.check_cxx(mandatory = 1, header_name = 'EGL/egl.h', uselib_store = 'EGL')
 	conf.check_cxx(mandatory = 1, header_name = 'bcm_host.h', uselib_store = 'EGL')
