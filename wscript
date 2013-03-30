@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 
-from waflib.Build import BuildContext, CleanContext, InstallContext, UninstallContext
+
+####
+## PREREQUISITES
+
+from waflib.Build import BuildContext, CleanContext, InstallContext, UninstallContext, Logs
 
 top = '.'
 out = 'build'
@@ -9,15 +13,48 @@ out = 'build'
 executable_name = 'eglinfo'
 
 
+
+
+####
+## OPTIONS
+
+
+valid_platforms = ['fb', 'x11']
+valid_devices = ['generic', 'imx6', 'beagleboard', 'raspberrypi']
+
+def options(opt):
+	opt.load('compiler_c')
+	opt.load('compiler_cxx')
+	egl_opts = opt.add_option_group("EGL specific options")
+	egl_opts.add_option('--platform', action='store', default='', help='platform to build for (valid values: ' + ' '.join(valid_platforms) + ')')
+	egl_opts.add_option('--device', action='store', default='generic', help='device to build for (valid values: ' + ' '.join(valid_devices) + ')')
+
+
+
+
+####
+## CONFIGURATION
+
+
+# generic (device agnostic) checks
+
+
+# Tests if a given compiler flag is supported by the compiler
 def check_compiler_flag(conf, flag, lang):
-	return conf.check(fragment = 'int main() { float f = 4.0; char c = f; return c - 4; }\n', execute = 0, define_ret = 0, msg = 'Checking for compiler switch %s' % flag, cxxflags = conf.env[lang + 'FLAGS'] + [flag], okmsg = 'yes', errmsg = 'no')  # the code inside fragment deliberately does an unsafe implicit cast float->char to trigger a compiler warning; sometimes, gcc does not tell about an unsupported parameter *unless* the code being compiled causes a warning
+	# the code inside fragment deliberately does an unsafe implicit cast float->char to trigger a compiler warning; sometimes, gcc does not tell about an unsupported parameter *unless* the code being compiled causes a warning
+	if lang == "CC":
+		return conf.check_cc(fragment = 'int main() { float f = 4.0; char c = f; return c - 4; }\n', execute = 0, define_ret = 0, msg = 'Checking for compiler switch %s' % flag, cflags = conf.env[lang + 'FLAGS'] + [flag], okmsg = 'yes', errmsg = 'no')
+	elif lang == "CXX":
+		return conf.check_cxx(fragment = 'int main() { float f = 4.0; char c = f; return c - 4; }\n', execute = 0, define_ret = 0, msg = 'Checking for compiler switch %s' % flag, cflags = conf.env[lang + 'FLAGS'] + [flag], okmsg = 'yes', errmsg = 'no')
+	else:
+		conf.fatal('check_compiler_flag called with invalid language "%s"' % lang)
 
-
-def check_compiler_flags_2(conf, cflags, ldflags, msg):
-	return conf.check(fragment = 'int main() { float f = 4.0; char c = f; return c - 4; }\n', execute = 0, define_ret = 0, msg = msg, cxxflags = cflags, ldflags = ldflags, okmsg = 'yes', errmsg = 'no')  # the code inside fragment deliberately does an unsafe implicit cast float->char to trigger a compiler warning; sometimes, gcc does not tell about an unsupported parameter *unless* the code being compiled causes a warning
-
-
-def add_compiler_flags(conf, env, flags, lang, compiler, uselib = ''):
+# Check each given compiler flag, and add it to the CFLAGS of the given uselib if the check is successful
+# By default, uselib is "", meaning that flags are added to the global CFLAGS value
+# Flags can also have an alternative; if the flag check fails, the alternative is checked in its place
+# Example call:
+#    add_compiler_flags(conf, env, ['-Wall', '-march=core2', ('-std=c++11', 'std=c++0x')], 'CXX', 'FOO')
+def add_compiler_flags(conf, env, flags, var_lang, comp_lang, uselib = ''):
 	for flag in flags:
 		if type(flag) == type(()):
 			flag_candidate = flag[0]
@@ -27,52 +64,36 @@ def add_compiler_flags(conf, env, flags, lang, compiler, uselib = ''):
 			flag_alternative = None
 
 		if uselib:
-			flags_pattern = lang + 'FLAGS_' + uselib
+			flags_pattern = var_lang + 'FLAGS_' + uselib
 		else:
-			flags_pattern = lang + 'FLAGS'
+			flags_pattern = var_lang + 'FLAGS'
 
-		if check_compiler_flag(conf, flag_candidate, compiler):
+		if check_compiler_flag(conf, flag_candidate, comp_lang):
 			env.prepend_value(flags_pattern, [flag_candidate])
 		elif flag_alternative:
-			if check_compiler_flag(conf, flag_alternative, compiler):
+			if check_compiler_flag(conf, flag_alternative, comp_lang):
 				env.prepend_value(flags_pattern, [flag_alternative])
 
-
+# Try to find one library of a given list
+# The first library found is stored in the given uselib_store
 def check_lib_list(conf, uselib, uselib_store, lib_list):
 	for lib in lib_list:
 		if conf.check_cxx(mandatory = 0, lib = lib, uselib = uselib, uselib_store = uselib_store):
 			return True
 	return False
 
-
-valid_platforms = ['fb', 'x11']
-valid_devices = ['generic', 'imx6', 'beagleboard', 'raspberrypi']
-
-
-def options(opt):
-	opt.load('compiler_c')
-	opt.load('compiler_cxx')
-	opt.add_option('--platform', action='store', default='', help='platform to build for (valid values: ' + ' '.join(valid_platforms) + ')')
-	opt.add_option('--device', action='store', default='generic', help='device to build for (valid values: ' + ' '.join(valid_devices) + ')')
-
-
-# generic (device agnostic) checks
-
 def check_x11(conf, uselib = ''):
 	conf.check_cxx(mandatory = 1, lib = 'X11', uselib = uselib, uselib_store = 'X11')
 	conf.check_cxx(mandatory = 1, header_name = 'X11/Xlib.h', uselib = uselib, uselib_store = 'X11')
-
 
 def check_egl(conf, uselib = ''):
 	conf.check_cxx(mandatory = 1, lib = 'EGL', uselib = uselib, uselib_store = 'EGL')
 	conf.check_cxx(mandatory = 1, header_name = 'EGL/egl.h', uselib = uselib, uselib_store = 'EGL')
 
-
 def check_openvg(conf, uselib = 'EGL'):
 	return \
 	  conf.check_cxx(mandatory = 0, lib = 'OpenVG', uselib = uselib, uselib_store = 'OPENVG') and \
 	  conf.check_cxx(mandatory = 0, header_name = 'VG/openvg.h', uselib = uselib, uselib_store = 'OPENVG')
-
 
 def check_gles1(conf, uselib = 'EGL', lib_list = ['GLESv1_CM', 'GLESV1_CL']):
 	retval = \
@@ -81,14 +102,12 @@ def check_gles1(conf, uselib = 'EGL', lib_list = ['GLESv1_CM', 'GLESV1_CL']):
 	conf.check_cxx(mandatory = 0, header_name = ['GLES2/gl2.h', 'GLES2/gl2ext.h'], uselib = uselib, define_name = 'WITH_GLEXT_H', uselib_store = 'GLES2')
 	return retval
 
-
 def check_gles2(conf, uselib = 'EGL', lib_list = ['GLESv2']):
 	retval = \
 	  check_lib_list(conf = conf, uselib = uselib, uselib_store = 'GLES2', lib_list = lib_list) and \
 	  conf.check_cxx(mandatory = 0, header_name = 'GLES2/gl2.h', uselib = uselib, uselib_store = 'GLES2')
 	conf.check_cxx(mandatory = 0, header_name = ['GLES2/gl2.h', 'GLES2/gl2ext.h'], uselib = uselib, define_name = 'WITH_GL2EXT_H', uselib_store = 'GLES2')
 	return retval
-
 
 def check_opengl(conf, uselib = 'EGL'):
 	return \
@@ -113,7 +132,6 @@ def configure_raspberrypi_device(conf, platform):
 	check_gles2(conf)
 	conf.env['WITH_APIS'] = ['GLES1', 'GLES2', 'OPENGL']
 
-
 def configure_beagleboard_device(conf, platform):
 	conf.env['PLATFORM_USELIBS'] = ['GLES2', 'OPENVG', 'EGL']
 	if platform == "x11":
@@ -127,7 +145,6 @@ def configure_beagleboard_device(conf, platform):
 	check_gles2(conf)
 	check_openvg(conf)
 	conf.env['WITH_APIS'] = ['GLES1', 'GLES2', 'OPENVG', 'OPENGL']
-
 
 def check_vivante_egl(conf, egl_macro):
 	conf.check_cxx(mandatory = 1, lib = ['EGL', 'GAL'], uselib_store = 'EGL')
@@ -155,7 +172,6 @@ def configure_imx6_device(conf, platform):
 		conf.env['PLATFORM_SOURCE'] = ['src/platform_fb_imx6.cpp']
 	check_gles2(conf)
 	check_openvg(conf)
-
 
 def configure_generic_device(conf, platform):
 	conf.env['PLATFORM_USELIBS'] = []
@@ -199,19 +215,19 @@ def configure_generic_device(conf, platform):
 	conf.env['PLATFORM_USELIBS'] += ['EGL']
 
 
+# main configuration function
 
-# main functions
 
 def configure(conf):
 	try:
 		valid_platforms.index(conf.options.platform)
 	except ValueError:
-		conf.fatal("Invalid or no platform selected")
+		conf.fatal('Invalid or no platform selected; run "./waf configure --help" for details about the --platform option')
 
 	try:
 		valid_devices.index(conf.options.device)
 	except ValueError:
-		conf.fatal("Invalid device selected")
+		conf.fatal('Invalid device selected; run "./waf configure --help" for details about the --device option')
 
 	conf.load('compiler_c')
 	conf.load('compiler_cxx')
@@ -240,19 +256,41 @@ def configure(conf):
 
 	variants_flags = [
 		{'name':'debug', 'flags':['-O0', '-g3', '-ggdb']},
-		{'name':'release', 'flags':['-O2', '-s']},
+		{'name':'release', 'flags':['-O2']},
 	]
 
 	original_env = conf.env
 	for variant_flags in variants_flags:
 		conf.setenv(variant_flags['name'], env = original_env.derive())
-                add_compiler_flags(conf, conf.env, variant_flags['flags'], 'C', 'CC')
-                add_compiler_flags(conf, conf.env, variant_flags['flags'], 'CXX', 'CXX')
+		add_compiler_flags(conf, conf.env, variant_flags['flags'], 'C', 'CC')
+		add_compiler_flags(conf, conf.env, variant_flags['flags'], 'CXX', 'CXX')
+
+	def log_api(name, b):
+		conf.start_msg(name)
+		if b:
+			conf.end_msg("yes", "GREEN")
+		else:
+			conf.end_msg("no", "YELLOW")
+
+	Logs.pprint("NORMAL", "")
+	conf.msg("Building for platform", conf.options.platform)
+	conf.msg("Building for device"  , conf.options.device)
+	Logs.pprint("NORMAL", "")
+	Logs.pprint("NORMAL", "API support:")
+	log_api("Desktop OpenGL", conf.env['WITH_OPENGL'])
+	log_api("OpenGL ES 1.x", conf.env['WITH_GLES1'])
+	log_api("OpenGL ES 2.x", conf.env['WITH_GLES2'])
+	log_api("OpenVG", conf.env['WITH_OPENVG'])
+
+
+
+
+####
+## BUILDING
 
 
 def build(bld):
 	source = [ \
-		"src/csv_writer.cpp", \
 		"src/json_writer.cpp", \
 		"src/log.cpp", \
 		"src/main.cpp", \
@@ -269,6 +307,12 @@ def build(bld):
 		target = executable_name,
 		source = source + bld.env['PLATFORM_SOURCE']
 	)
+
+
+
+
+####
+## INITIALIZATION
 
 
 def init(ctx):

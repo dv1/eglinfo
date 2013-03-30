@@ -43,7 +43,6 @@ freely, subject to the following restrictions:
 #include "writer.hpp"
 #include "text_writer.hpp"
 #include "json_writer.hpp"
-#include "csv_writer.hpp"
 
 
 void write_info(eglinfo::writer &p_writer, eglinfo::egl_scope const &p_egl_scope)

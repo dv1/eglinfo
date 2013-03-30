@@ -139,7 +139,7 @@ void print_renderables(std::ostream &p_out, EGLint const p_renderables, EGLint c
 	}
 	if (p_renderables & EGL_OPENGL_ES_BIT)
 	{
-		str += "es";
+		str += "es1";
 		str += (p_conformance & EGL_OPENGL_ES_BIT) ? "(c)" : "(n)";
 		str += ",";
 	}
@@ -172,7 +172,6 @@ void print_caveat(std::ostream &p_out, EGLint const p_caveat, std::string::size_
 	switch (p_caveat)
 	{
 		case EGL_NONE: str = "none"; break;
-		case EGL_DONT_CARE: str = "dontcare"; break;
 		case EGL_SLOW_CONFIG: str = "slow"; break;
 		case EGL_NON_CONFORMANT_CONFIG: str = "nonconfmt"; break;
 		default: str = "???"; break;
@@ -257,7 +256,10 @@ void text_writer::begin_write_egl_configs(EGLint const p_num_configs)
 {
 	m_out << "   number of configurations: " << p_num_configs << "\n";
 	m_out << "\n";
-
+	m_out << "win = window      (c) = conformant             slow      = slow config               gl      = Desktop OpenGL                                                         \n";
+	m_out << "pb  = pbuffer     (n) = non-conformant         nonconfmt = non-conformant config     es1,es2 = OpenGL ES 1.x/2.x                                                      \n";
+	m_out << "pix = pixmap                                                                         vg      = OpenVG                                                                 \n";
+	m_out << "\n";
 	m_out << "      #      ID  LEVEL  COLORBUFFER..........  DEPTH  STENCIL  MULTISAMPLE....  VISUAL.......  SURFACES..  RENDERABLES......................  TRANSPARENT..  CAVEAT...\n";
 	m_out << "                        type size  r  g  b  a  size   size     samples buffers  type   id                  apis                       native  type  r  g  b           \n";
 }

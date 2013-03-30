@@ -789,7 +789,7 @@ int json_print_init(json_printer *printer, json_printer_callback callback, void 
  * doesn't do anything now, but in future print_init could allocate memory */
 int json_print_free(json_printer *printer)
 {
-	printer = printer; /* shuts up compiler warning */
+	printer = 0; /* shuts up compiler warning */
 	return 0;
 }
 
@@ -917,7 +917,8 @@ int json_print_args(json_printer *printer,
 		case JSON_STRING:
 			data = va_arg(ap, char *);
 			length = va_arg(ap, uint32_t);
-			if (length == -1)
+			/* -1 cast is ugly, but standards compliant */
+			if (length == (uint32_t)(-1))
 				length = strlen(data);
 			ret = (*f)(printer, type, data, length);
 			break;
