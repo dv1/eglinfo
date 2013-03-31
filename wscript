@@ -251,7 +251,7 @@ def configure(conf):
 
 	conf.write_config_header()
 
-	add_compiler_flags(conf, conf.env, ['-Wextra', '-Wall', '-std=c99', '-pedantic'], 'C', 'CC')
+	add_compiler_flags(conf, conf.env, ['-Wextra', '-Wall', '-Wno-unused-parameter', '-std=c99', '-pedantic'], 'C', 'CC')
 	add_compiler_flags(conf, conf.env, ['-Wextra', '-Wall', '-std=c++98', '-pedantic'], 'CXX', 'CXX')
 
 	variants_flags = [

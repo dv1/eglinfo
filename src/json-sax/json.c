@@ -789,7 +789,6 @@ int json_print_init(json_printer *printer, json_printer_callback callback, void 
  * doesn't do anything now, but in future print_init could allocate memory */
 int json_print_free(json_printer *printer)
 {
-	printer = 0; /* shuts up compiler warning */
 	return 0;
 }
 
