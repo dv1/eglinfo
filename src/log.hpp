@@ -45,7 +45,7 @@ char const *get_egl_error_string(EGLint p_error);
 		EGLint egl_error_num__ = eglGetError(); \
 		if (egl_error_num__ != EGL_SUCCESS) \
 		{ \
-			std::cerr << MSG << get_egl_error_string(egl_error_num__) << "\n"; \
+			std::cerr << MSG << ": " << get_egl_error_string(egl_error_num__) << "\n"; \
 		} \
 		else \
 		{ \

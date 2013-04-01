@@ -161,7 +161,8 @@ int main(int argc, char **argv)
 
 	eglinfo::egl_scope egl(d);
 
-	write_info(*writer, egl);
+	if (egl)
+		write_info(*writer, egl);
 
 	return 0;
 }
