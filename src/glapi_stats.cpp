@@ -165,7 +165,7 @@ char const * get_shader_binary_format_string(GLint const p_format)
 #ifdef GL_FJ_shader_binary_GCCSO
 		case GCCSO_SHADER_BINARY_FJ: return "FJ_shader_binary_GCCSO";
 #endif
-#ifdef GL_IMG_shader_binary
+#if defined(GL_IMG_shader_binary) || defined(GL_IMG_binary_shader)
 		case GL_SGX_BINARY_IMG: return "SGX_BINARY_IMG";
 #endif
 		default: return 0;

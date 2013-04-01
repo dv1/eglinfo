@@ -44,6 +44,9 @@ If the platform is set to x11, the default generic device is usually enough. If 
 you must set the appropiate DEVICE parameter, because EGL initialization on top of the framebuffer is
 device specific.
 
+The "beagleboard" device should be useful for many other devices that share identical or similar
+PowerVR hardware, such as the IGEP boards, the Nokia N900, the PandaBoard, TI AM3359 based devices etc.
+
 
 PREFIX is the installation prefix.
 

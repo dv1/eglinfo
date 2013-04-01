@@ -133,6 +133,7 @@ def configure_raspberrypi_device(conf, platform):
 	conf.env['WITH_APIS'] = ['GLES1', 'GLES2', 'OPENGL']
 
 def configure_beagleboard_device(conf, platform):
+	# OpenGL ES 1 does not seem to work properly for this device
 	conf.env['PLATFORM_USELIBS'] = ['GLES2', 'OPENVG', 'EGL']
 	if platform == "x11":
 		check_x11(conf)
@@ -142,9 +143,11 @@ def configure_beagleboard_device(conf, platform):
 		conf.env['PLATFORM_SOURCE'] = ['src/platform_fb_generic.cpp']
 	conf.check_cxx(mandatory = 1, lib = ['EGL', 'IMGegl', 'srv_um'], uselib_store = 'EGL')
 	conf.check_cxx(mandatory = 1, header_name = 'EGL/egl.h', uselib_store = 'EGL')
-	check_gles2(conf)
-	check_openvg(conf)
-	conf.env['WITH_APIS'] = ['GLES1', 'GLES2', 'OPENVG', 'OPENGL']
+	conf.env['WITH_APIS'] = []
+	if check_gles2(conf):
+		conf.env['WITH_APIS'] += ['GLES2']
+	if check_openvg(conf):
+		conf.env['WITH_APIS'] += ['OPENVG']
 
 def check_vivante_egl(conf, egl_macro):
 	conf.check_cxx(mandatory = 1, lib = ['EGL', 'GAL'], uselib_store = 'EGL')
