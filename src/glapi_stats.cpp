@@ -27,6 +27,8 @@ freely, subject to the following restrictions:
 
 
 #include "glapi_stats.hpp"
+#include "binary_program_formats.hpp"
+#include "binary_shader_formats.hpp"
 #include "compressed_texformats.hpp"
 
 
@@ -48,6 +50,7 @@ main_glapi_stats::main_glapi_stats()
 shader_glapi_stats::shader_glapi_stats()
 	: m_max_vertex_attribs(0)
 	, m_max_vertex_texture_image_units(0)
+	, m_num_program_binary_formats(0)
 	, m_num_shader_binary_formats(0)
 	, m_max_varying_vectors(0)
 	, m_max_vertex_uniform_vectors(0)
@@ -146,28 +149,27 @@ char const * get_compressed_texture_format_string(GLint const p_format)
 }
 
 
+char const * get_program_binary_format_string(GLint const p_format)
+{
+	switch (p_format)
+	{
+		case GL_Z400_BINARY_AMD: return "Z400_BINARY_AMD";
+		case GL_MALI_PROGRAM_BINARY_ARM: return "MALI_PROGRAM_BINARY_ARM";
+		case GL_SGX_PROGRAM_BINARY_IMG: return "SGX_PROGRAM_BINARY_IMG";
+		default: return 0;
+	}
+}
+
+
 char const * get_shader_binary_format_string(GLint const p_format)
 {
 	switch (p_format)
 	{
-#ifdef GL_AMD_program_binary_Z400
-		case GL_Z400_BINARY_AMD: return "Z400_BINARY_AMD";
-#endif
-#ifdef GL_VIV_shader_binary
 		case GL_SHADER_BINARY_VIV: return "SHADER_BINARY_VIV";
-#endif
-#ifdef GL_ARM_mali_shader_binary
 		case GL_MALI_SHADER_BINARY_ARM: return "MALI_SHADER_BINARY";
-#endif
-#ifdef GL_DMP_shader_binary
 		case GL_SHADER_BINARY_DMP: return "SHADER_BINARY_DMP";
-#endif
-#ifdef GL_FJ_shader_binary_GCCSO
 		case GCCSO_SHADER_BINARY_FJ: return "FJ_shader_binary_GCCSO";
-#endif
-#if defined(GL_IMG_shader_binary) || defined(GL_IMG_binary_shader)
 		case GL_SGX_BINARY_IMG: return "SGX_BINARY_IMG";
-#endif
 		default: return 0;
 	}
 }

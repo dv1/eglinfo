@@ -361,11 +361,25 @@ void json_writer::write_glapi_stats(
 
 		json_print_keyvalue("max_vertex_attribs", p_stats.m_shader_stats.m_max_vertex_attribs);
 		json_print_keyvalue("max_vertex_texture_image_units", p_stats.m_shader_stats.m_max_vertex_texture_image_units);
+		json_print_keyvalue("num_program_binary_formats", p_stats.m_shader_stats.m_num_program_binary_formats);
 		json_print_keyvalue("num_shader_binary_formats", p_stats.m_shader_stats.m_num_shader_binary_formats);
 		json_print_keyvalue("max_varying_vectors", p_stats.m_shader_stats.m_max_varying_vectors);
 		json_print_keyvalue("max_vertex_uniform_vectors", p_stats.m_shader_stats.m_max_vertex_uniform_vectors);
 		json_print_keyvalue("max_fragment_uniform_vectors", p_stats.m_shader_stats.m_max_fragment_uniform_vectors);
 		json_print_keyvalue("shader_compiler", p_stats.m_shader_stats.m_shader_compiler);
+
+		json_print_key("program_binary_formats");
+		json_print_base(JSON_OBJECT_BEGIN, NULL, 0);
+		for (integers::const_iterator iter = p_stats.m_shader_stats.m_program_binary_formats.begin(); iter != p_stats.m_shader_stats.m_program_binary_formats.end(); ++iter)
+		{
+			char const *str = get_program_binary_format_string(*iter);
+			json_print_key(*iter);
+			if (str != 0)
+				json_print(str);
+			else
+				json_print_base(JSON_NULL, NULL, 0);
+		}
+		json_print_base(JSON_OBJECT_END, NULL, 0);
 
 		json_print_key("shader_binary_formats");
 		json_print_base(JSON_OBJECT_BEGIN, NULL, 0);

@@ -421,12 +421,21 @@ void text_writer::write_glapi_stats(
 			<< "  shader specific stats:\n"
 			<< "    max vertex attribs:             " << p_stats.m_shader_stats.m_max_vertex_attribs << "\n"
 			<< "    max vertex texture image units: " << p_stats.m_shader_stats.m_max_vertex_texture_image_units << "\n"
+			<< "    num program binary formats:     " << p_stats.m_shader_stats.m_num_program_binary_formats << "\n"
 			<< "    num shader binary formats:      " << p_stats.m_shader_stats.m_num_shader_binary_formats << "\n"
 			<< "    max varying vectors:            " << p_stats.m_shader_stats.m_max_varying_vectors << "\n"
 			<< "    max vertex uniform vectors:     " << p_stats.m_shader_stats.m_max_vertex_uniform_vectors << "\n"
 			<< "    max fragment uniform vectors:   " << p_stats.m_shader_stats.m_max_fragment_uniform_vectors << "\n"
 			<< "    shader compiler:                " << yesno(p_stats.m_shader_stats.m_shader_compiler) << "\n"
 			;
+		if (p_stats.m_shader_stats.m_num_program_binary_formats > 0)
+		{
+			m_out << "    supported program binary formats:\n";
+			for (integers::const_iterator binfmt_iter = p_stats.m_shader_stats.m_program_binary_formats.begin(); binfmt_iter != p_stats.m_shader_stats.m_program_binary_formats.end(); ++binfmt_iter)
+			{
+				m_out << "      " << print_named_gl_value(*binfmt_iter, get_program_binary_format_string(*binfmt_iter)) << "\n";
+			}
+		}
 		if (p_stats.m_shader_stats.m_num_shader_binary_formats > 0)
 		{
 			m_out << "    supported shader binary formats:\n";

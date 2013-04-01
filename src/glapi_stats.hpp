@@ -69,6 +69,7 @@ struct shader_glapi_stats
 	GLint
 		  m_max_vertex_attribs
 		, m_max_vertex_texture_image_units
+		, m_num_program_binary_formats
 		, m_num_shader_binary_formats
 		, m_max_varying_vectors
 		, m_max_vertex_uniform_vectors
@@ -77,6 +78,7 @@ struct shader_glapi_stats
 
 	bool m_shader_compiler;
 
+	integers m_program_binary_formats;
 	integers m_shader_binary_formats;
 
 	shader_glapi_stats();
@@ -95,6 +97,7 @@ struct glapi_stats
 
 
 char const * get_compressed_texture_format_string(GLint const p_format);
+char const * get_program_binary_format_string(GLint const p_format);
 char const * get_shader_binary_format_string(GLint const p_format);
 char const * get_color_format_string(GLint const p_format);
 char const * get_color_type_string(GLint const p_type);
