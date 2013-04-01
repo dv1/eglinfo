@@ -301,6 +301,7 @@ def build(bld):
 		"src/scopes.cpp", \
 		"src/text_writer.cpp", \
 		"src/glapi_stats.cpp", \
+		"src/openvg_stats.cpp", \
 		"src/json-sax/json.c", \
 	]
 	bld(

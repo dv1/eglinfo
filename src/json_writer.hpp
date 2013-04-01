@@ -87,6 +87,8 @@ public:
 		, char const *p_extensions
 	);
 
+	virtual void write_vg_stats(openvg_stats const &p_stats);
+
 	virtual void begin_write_vg_image_format_acceleration();
 	virtual void write_vg_image_format_acceleration(
 		  int const p_format

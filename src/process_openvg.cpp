@@ -160,6 +160,20 @@ void process_vg_info(writer &p_vg_writer, egl_scope const &p_egl_scope)
 		, reinterpret_cast < char const * > (vgGetString(VG_EXTENSIONS))
 	);
 
+	openvg_stats stats;
+	stats.m_max_scissor_rects          = vgGeti(VG_MAX_SCISSOR_RECTS);
+	stats.m_max_dash_count             = vgGeti(VG_MAX_DASH_COUNT);
+	stats.m_max_kernel_size            = vgGeti(VG_MAX_KERNEL_SIZE);
+	stats.m_max_separable_kernel_size  = vgGeti(VG_MAX_SEPARABLE_KERNEL_SIZE);
+	stats.m_max_color_ramp_stops       = vgGeti(VG_MAX_COLOR_RAMP_STOPS);
+	stats.m_max_image_width            = vgGeti(VG_MAX_IMAGE_WIDTH);
+	stats.m_max_image_height           = vgGeti(VG_MAX_IMAGE_HEIGHT);
+	stats.m_max_image_pixels           = vgGeti(VG_MAX_IMAGE_PIXELS);
+	stats.m_max_image_bytes            = vgGeti(VG_MAX_IMAGE_BYTES);
+	stats.m_max_gaussian_std_deviation = vgGeti(VG_MAX_GAUSSIAN_STD_DEVIATION);
+
+	p_vg_writer.write_vg_stats(stats);
+
 	p_vg_writer.begin_write_vg_image_format_acceleration();
 	for (image_format_accel_entry const *accel_entry = image_format_accel_table; accel_entry->m_name != NULL; ++accel_entry)
 	{

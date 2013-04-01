@@ -32,6 +32,7 @@ freely, subject to the following restrictions:
 #include <EGL/egl.h>
 #include "egl_config.hpp"
 #include "glapi_stats.hpp"
+#include "openvg_stats.hpp"
 
 
 namespace eglinfo
@@ -100,6 +101,9 @@ public:
 		, char const *p_renderer       // renderer string
 		, char const *p_extensions     // whitespace-separated list of extensions
 	) = 0;
+
+	// Write stats about OpenVG.
+	virtual void write_vg_stats(openvg_stats const &p_stats) = 0;
 
 	// Begin and end the list of image formats and whether or not they are hardware-accelerated.
 	virtual void begin_write_vg_image_format_acceleration() = 0;

@@ -471,6 +471,24 @@ void text_writer::write_main_vg_info(
 }
 
 
+void text_writer::write_vg_stats(openvg_stats const &p_stats)
+{
+	std::cout
+		<< "  stats:\n"
+		<< "    max scissor rects:          " << p_stats.m_max_scissor_rects << "\n"
+		<< "    max dash count:             " << p_stats.m_max_dash_count << "\n"
+		<< "    max kernel size:            " << p_stats.m_max_kernel_size << "\n"
+		<< "    max separable kernel size:  " << p_stats.m_max_separable_kernel_size << "\n"
+		<< "    max color ramp stops:       " << p_stats.m_max_color_ramp_stops << "\n"
+		<< "    max image width:            " << p_stats.m_max_image_width << "\n"
+		<< "    max image height:           " << p_stats.m_max_image_height << "\n"
+		<< "    max image pixels:           " << p_stats.m_max_image_pixels << "\n"
+		<< "    max image bytes:            " << p_stats.m_max_image_bytes << "\n"
+		<< "    max gaussian std deviation: " << p_stats.m_max_gaussian_std_deviation << "\n"
+		;
+}
+
+
 void text_writer::begin_write_vg_image_format_acceleration()
 {
 	std::cout

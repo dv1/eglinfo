@@ -413,6 +413,26 @@ void json_writer::write_main_vg_info(
 }
 
 
+void json_writer::write_vg_stats(openvg_stats const &p_stats)
+{
+	json_print_key("main_stats");
+	json_print_base(JSON_OBJECT_BEGIN, NULL, 0);
+
+	json_print_keyvalue("max_scissor_rects", p_stats.m_max_scissor_rects);
+	json_print_keyvalue("max_dash_count", p_stats.m_max_dash_count);
+	json_print_keyvalue("max_kernel_size", p_stats.m_max_kernel_size);
+	json_print_keyvalue("max_separable_kernel_size", p_stats.m_max_separable_kernel_size);
+	json_print_keyvalue("max_color_ramp_stops", p_stats.m_max_color_ramp_stops);
+	json_print_keyvalue("max_image_width", p_stats.m_max_image_width);
+	json_print_keyvalue("max_image_height", p_stats.m_max_image_height);
+	json_print_keyvalue("max_image_pixels", p_stats.m_max_image_pixels);
+	json_print_keyvalue("max_image_bytes", p_stats.m_max_image_bytes);
+	json_print_keyvalue("max_gaussian_std_deviation", p_stats.m_max_gaussian_std_deviation);
+
+	json_print_base(JSON_OBJECT_END, NULL, 0);
+}
+
+
 void json_writer::begin_write_vg_image_format_acceleration()
 {
 	json_print_key("image_format_acceleration");
