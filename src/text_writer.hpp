@@ -65,6 +65,7 @@ public:
 	virtual void end_write_egl_configs();
 	virtual void write_no_egl_configs();
 
+#if defined(WITH_OPENGL) || defined(WITH_GLES1) || defined(WITH_GLES2)
 	virtual void write_main_glapi_info(
 		  EGLenum const p_api
 		, char const *p_api_name
@@ -78,7 +79,9 @@ public:
 		, char const *p_api_name
 		, glapi_stats const &p_stats
 	);
+#endif
 
+#if defined(WITH_OPENVG)
 	virtual void write_main_vg_info(
 		  char const *p_vendor
 		, char const *p_version
@@ -102,6 +105,7 @@ public:
 		, bool const p_signed32
 		, bool const p_float
 	);
+#endif
 
 
 private:

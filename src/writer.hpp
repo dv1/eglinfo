@@ -30,9 +30,16 @@ freely, subject to the following restrictions:
 #define EGLINFO_WRITER_HPP
 
 #include <EGL/egl.h>
+#include <config.h>
 #include "egl_config.hpp"
+
+#if defined(WITH_OPENGL) || defined(WITH_GLES1) || defined(WITH_GLES2)
 #include "glapi_stats.hpp"
+#endif
+
+#if defined(WITH_OPENVG)
 #include "openvg_stats.hpp"
+#endif
 
 
 namespace eglinfo
@@ -77,6 +84,7 @@ public:
 	// Used if there are no EGL configurations (instead of an empty EGL configs block).
 	virtual void write_no_egl_configs() = 0;
 
+#if defined(WITH_OPENGL) || defined(WITH_GLES1) || defined(WITH_GLES2)
 	// Common function for writing main information about a GL API (OpenGL ES 1.x, OpenGL ES 2.x, and Desktop OpenGL).
 	virtual void write_main_glapi_info(
 		  EGLenum const p_api        // the EGL API name
@@ -93,7 +101,9 @@ public:
 		, char const *p_api_name      // human-readable name of the API
 		, glapi_stats const &p_stats  // main and shader specific stats about the API
 	) = 0;
+#endif
 
+#if defined(WITH_OPENVG)
 	// Write main information about OpenVG.
 	virtual void write_main_vg_info(
 		  char const *p_vendor         // vendor string
@@ -123,6 +133,7 @@ public:
 		, bool const p_signed32
 		, bool const p_float
 	) = 0;
+#endif
 
 	virtual ~writer()
 	{

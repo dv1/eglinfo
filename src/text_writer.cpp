@@ -351,6 +351,7 @@ void text_writer::write_no_egl_configs()
 }
 
 
+#if defined(WITH_OPENGL) || defined(WITH_GLES1) || defined(WITH_GLES2)
 void text_writer::write_main_glapi_info(
 	  EGLenum const
 	, char const *p_api_name
@@ -447,8 +448,10 @@ void text_writer::write_glapi_stats(
 
 	}
 }
+#endif
 
 
+#if defined(WITH_OPENVG)
 void text_writer::write_main_vg_info(
 	  char const *p_vendor
 	, char const *p_version
@@ -536,6 +539,7 @@ void text_writer::write_vg_path_datatype_acceleration(
 		<< "\n"
 		;
 }
+#endif
 
 
 } // namespace eglinfo end

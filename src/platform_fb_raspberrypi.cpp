@@ -48,6 +48,8 @@ struct native_display::internals
 native_display::native_display(char const *)
 	: m_egl_native_display(EGL_DEFAULT_DISPLAY)
 {
+	bcm_host_init();
+
 	m_internals = new internals;
 	m_internals->m_dispman_display = vc_dispmanx_display_open(0/* LCD */);
 }

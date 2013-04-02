@@ -23,7 +23,7 @@ Building and installing
 
 eglinfo uses the [waf meta build system](https://code.google.com/p/waf/). To configure , run:
 
-    ./waf configure --platform=PLATFORM --device=DEVICE --prefix=PREFIX
+    ./waf configure --platform=PLATFORM --device=DEVICE --prefix=PREFIX --sysroot=SYSROOT
 
 
 PLATFORM is the platform to build for. Currently, the valid values are:
@@ -47,8 +47,10 @@ device specific.
 The "beagleboard" device should be useful for many other devices that share identical or similar
 PowerVR hardware, such as the IGEP boards, the Nokia N900, the PandaBoard, TI AM3359 based devices etc.
 
-
 PREFIX is the installation prefix.
+
+SYSROOT is the path to the system root, the place where the rootfs is installed, and the device's /usr/include/,
+/usr/lib etc. paths are located. On the PC, this does not need to be set.
 
 
 Once configuration is complete, run:
@@ -94,6 +96,8 @@ To add support for another device, you must:
    native\_display and native\_window classes in there
 2. Add a configuration block to the wscript file
 3. Add device NAME to the valid\_devices list in the wscript
+4. Add device NAME to the needs\_sysroot and needs\_prefix lists in the wscript if the
+   device configuration requires these values to be set
 
 
 License

@@ -21,6 +21,8 @@ executable_name = 'eglinfo'
 
 valid_platforms = ['fb', 'x11']
 valid_devices = ['generic', 'imx6', 'beagleboard', 'raspberrypi']
+needs_sysroot = ['raspberrypi']
+needs_prefix = ['raspberrypi']
 
 def options(opt):
 	opt.load('compiler_c')
@@ -28,6 +30,7 @@ def options(opt):
 	egl_opts = opt.add_option_group("EGL specific options")
 	egl_opts.add_option('--platform', action='store', default='', help='platform to build for (valid values: ' + ' '.join(valid_platforms) + ')')
 	egl_opts.add_option('--device', action='store', default='generic', help='device to build for (valid values: ' + ' '.join(valid_devices) + ')')
+	egl_opts.add_option('--sysroot', action='store', default='', help='sysroot path')
 
 
 
@@ -127,10 +130,17 @@ def configure_raspberrypi_device(conf, platform):
 	elif platform == "fb":
 		conf.env['PLATFORM_SOURCE'] = ['src/platform_fb_raspberrypi.cpp']
 	conf.check_cxx(mandatory = 1, lib = ['GLESv2', 'EGL', 'bcm_host'], uselib_store = 'EGL')
-	conf.check_cxx(mandatory = 1, header_name = 'EGL/egl.h', uselib_store = 'EGL')
-	conf.check_cxx(mandatory = 1, header_name = 'bcm_host.h', uselib_store = 'EGL')
-	check_gles2(conf)
-	conf.env['WITH_APIS'] = ['GLES1', 'GLES2', 'OPENGL']
+	import os
+	sysroot = conf.options.sysroot + conf.options.prefix
+	vcos_pthread_path = os.path.join(sysroot, 'include/interface/vcos/pthreads')
+	vcms_host_path = os.path.join(sysroot, 'include/interface/vmcs_host/linux')
+	if not conf.check_cxx(mandatory = 0, header_name = ['vcos_platform_types.h', 'EGL/egl.h', 'bcm_host.h'], includes = [vcos_pthread_path, vcms_host_path], uselib_store = 'EGL'):
+		conf.fatal('Check if --prefix and --sysroot are set correctly.')
+	conf.env['WITH_APIS'] = []
+	if check_gles2(conf):
+		conf.env['WITH_APIS'] += ['GLES1', 'GLES2']
+	if check_openvg(conf):
+		conf.env['WITH_APIS'] += ['OPENVG']
 
 def configure_beagleboard_device(conf, platform):
 	# OpenGL ES 1 does not seem to work properly for this device
@@ -222,15 +232,18 @@ def configure_generic_device(conf, platform):
 
 
 def configure(conf):
-	try:
-		valid_platforms.index(conf.options.platform)
-	except ValueError:
+	if not conf.options.platform in valid_platforms:
 		conf.fatal('Invalid or no platform selected; run "./waf configure --help" for details about the --platform option')
 
-	try:
-		valid_devices.index(conf.options.device)
-	except ValueError:
+	if not conf.options.device in valid_devices:
 		conf.fatal('Invalid device selected; run "./waf configure --help" for details about the --device option')
+
+	if (conf.options.device in needs_sysroot) and not (conf.options.sysroot):
+		conf.fatal('Device %s needs --sysroot to be set' % conf.options.device)
+
+	if (conf.options.device in needs_prefix) and not (conf.options.prefix):
+		conf.fatal('Device %s needs --prefix to be set' % conf.options.device)
+
 
 	conf.load('compiler_c')
 	conf.load('compiler_cxx')
@@ -248,9 +261,9 @@ def configure(conf):
 		conf.define('WITH_' + api, 1)
 
 	if conf.env['WITH_GLES1'] or conf.env['WITH_GLES2'] or conf.env['WITH_OPENGL']:
-		conf.env['PLATFORM_SOURCE'] += ['src/process_glapi.cpp']
+		conf.env['PLATFORM_SOURCE'] += ['src/glapi_stats.cpp', 'src/process_glapi.cpp']
 	if conf.env['WITH_OPENVG']:
-		conf.env['PLATFORM_SOURCE'] += ['src/process_openvg.cpp']
+		conf.env['PLATFORM_SOURCE'] += ['src/openvg_stats.cpp', 'src/process_openvg.cpp']
 
 	conf.write_config_header()
 
@@ -300,8 +313,6 @@ def build(bld):
 		"src/process_egl.cpp", \
 		"src/scopes.cpp", \
 		"src/text_writer.cpp", \
-		"src/glapi_stats.cpp", \
-		"src/openvg_stats.cpp", \
 		"src/json-sax/json.c", \
 	]
 	bld(

@@ -91,6 +91,7 @@ void json_writer::json_print(std::string const &p_string)
 }
 
 
+#if defined(WITH_OPENGL) || defined(WITH_GLES1) || defined(WITH_GLES2)
 void json_writer::json_print(integers const &p_integers)
 {
 	json_print_base(JSON_ARRAY_BEGIN, NULL, 0);
@@ -98,6 +99,7 @@ void json_writer::json_print(integers const &p_integers)
 		json_print(*iter);
 	json_print_base(JSON_ARRAY_END, NULL, 0);
 }
+#endif
 
 
 void json_writer::json_print_key(char const *p_key)
@@ -303,6 +305,7 @@ void json_writer::write_no_egl_configs()
 }
 
 
+#if defined(WITH_OPENGL) || defined(WITH_GLES1) || defined(WITH_GLES2)
 void json_writer::write_main_glapi_info(
 	  EGLenum const
 	, char const *
@@ -397,8 +400,10 @@ void json_writer::write_glapi_stats(
 		json_print_base(JSON_OBJECT_END, NULL, 0);
 	}
 }
+#endif
 
 
+#if defined(WITH_OPENVG)
 void json_writer::write_main_vg_info(
 	  char const *p_vendor
 	, char const *p_version
@@ -475,6 +480,7 @@ void json_writer::write_vg_path_datatype_acceleration(
 	json_print_keyvalue("f", p_float);
 	json_print_base(JSON_OBJECT_END, NULL, 0);
 }
+#endif
 
 
 } // namespace eglinfo end
