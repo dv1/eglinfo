@@ -27,6 +27,8 @@ freely, subject to the following restrictions:
 
 
 #include <iostream>
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
 #include "platform.hpp"
 
 
@@ -43,10 +45,12 @@ native_window::native_window(native_display const &p_native_display, EGLint cons
 	int screen_num = DefaultScreen(egl_native_display);
 	Window root_window = RootWindow(egl_native_display, screen_num);
 
+	Display *x11_display = reinterpret_cast < Display* > (egl_native_display);
+
 	XVisualInfo visual_info_template, *visual_info;
 	int num_visuals;
 	visual_info_template.visualid = p_visual_id;
-	visual_info = XGetVisualInfo(egl_native_display, VisualIDMask, &visual_info_template, &num_visuals);
+	visual_info = XGetVisualInfo(x11_display, VisualIDMask, &visual_info_template, &num_visuals);
 
 	if (!visual_info)
 	{
@@ -58,12 +62,14 @@ native_window::native_window(native_display const &p_native_display, EGLint cons
 	unsigned long mask;
 	attr.background_pixel = 0;
 	attr.border_pixel = 0;
-	attr.colormap = XCreateColormap(egl_native_display, root_window, visual_info->visual, AllocNone);
+	attr.colormap = XCreateColormap(x11_display, root_window, visual_info->visual, AllocNone);
 	attr.event_mask = StructureNotifyMask | ExposureMask | KeyPressMask;
 	mask = CWBackPixel | CWBorderPixel | CWColormap | CWEventMask;
-	m_egl_native_window = XCreateWindow(egl_native_display, root_window, 0, 0, 400, 300,
+	Window x11_window = XCreateWindow(x11_display, root_window, 0, 0, 400, 300,
 			    0, visual_info->depth, InputOutput,
 			    visual_info->visual, mask, &attr);
+
+	m_egl_native_window = EGLNativeWindowType(x11_window);
 
 	{
 		XSizeHints sizehints;
@@ -72,8 +78,8 @@ native_window::native_window(native_display const &p_native_display, EGLint cons
 		sizehints.width  = 400;
 		sizehints.height = 300;
 		sizehints.flags = USSize | USPosition;
-		XSetNormalHints(egl_native_display, m_egl_native_window, &sizehints);
-		XSetStandardProperties(egl_native_display, m_egl_native_window, "eglinfo_testwindow", "eglinfo_testwindow", None, (char **)NULL, 0, &sizehints);
+		XSetNormalHints(x11_display, x11_window, &sizehints);
+		XSetStandardProperties(x11_display, x11_window, "eglinfo_testwindow", "eglinfo_testwindow", None, (char **)NULL, 0, &sizehints);
 	}
 
 	XFree(visual_info);
@@ -83,7 +89,10 @@ native_window::native_window(native_display const &p_native_display, EGLint cons
 native_window::~native_window()
 {
 	if (m_egl_native_window)
-		XDestroyWindow(m_native_display.get_egl_native_display(), m_egl_native_window);
+		XDestroyWindow(
+			  reinterpret_cast < Display* > (m_native_display.get_egl_native_display())
+			, reinterpret_cast < Window > (m_egl_native_window)
+		);
 }
 
 
@@ -109,7 +118,7 @@ native_display::native_display(char const *p_name)
 native_display::~native_display()
 {
 	if (m_egl_native_display != NULL)
-		XCloseDisplay(m_egl_native_display);
+		XCloseDisplay(reinterpret_cast < Display* > (m_egl_native_display));
 }
 
 
