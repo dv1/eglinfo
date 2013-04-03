@@ -17,15 +17,11 @@ S = "${WORKDIR}/git"
 # not doing that here, since some platforms might not have OpenGL ES or OpenVG support
 # (in that case, the eglinfo build scripts automatically disable the relevant code paths)
 
+EGLINFO_DEVICE ?= "generic"
 EGLINFO_DEVICE_raspberrypi ?= "raspberrypi"
 EGLINFO_DEVICE_beagleboard ?= "beagleboard"
-EGLINFO_DEVICE_imx6 ?= "imx6"
-EGLINFO_DEVICE_cubox ?= "generic"
+EGLINFO_DEVICE_mx6 ?= "imx6"
 
-
-do_compile() {
-	${S}/waf
-}
 
 do_clean() {
 	if [ -x ${S}/waf ]; then
@@ -39,8 +35,11 @@ do_configure() {
 		--device=${EGLINFO_DEVICE} \
 		--sysroot ${STAGING_DIR_TARGET} \
 		--prefix=${prefix} \
-		${EXTRA_OECONF} \
-		"$@"
+		${EXTRA_OECONF}
+}
+
+do_compile() {
+	${S}/waf
 }
 
 do_install() {

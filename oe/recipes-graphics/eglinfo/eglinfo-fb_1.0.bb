@@ -9,5 +9,3 @@ EGLINFO_BINARY_NAME ?= "eglinfo-fb"
 include eglinfo.inc
 
 SUMMARY += "(Framebuffer version)"
-
-PR = "r0"
