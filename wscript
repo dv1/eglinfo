@@ -85,6 +85,35 @@ def check_lib_list(conf, uselib, uselib_store, lib_list):
 			return True
 	return False
 
+def check_gccso_shader_binary_def(conf):
+	fragment_template = """
+		#include <EGL/egl.h>
+		#include <GLES2/gl2.h>
+		#include <GLES2/gl2ext.h>
+		#include <iostream>
+
+		int main()
+		{
+			std::cout << (%s);
+			return 0;
+		}
+	"""
+	checks = [ \
+		( 'GL_GCCSO_SHADER_BINARY_FJ', 'WITH_FIXED_GCCSO_SHADER_BINARY_DEF', 'fixed' ), \
+		( 'GCCSO_SHADER_BINARY_FJ', 'WITH_OLD_GCCSO_SHADER_BINARY_DEF', 'old' ), \
+	]
+	passed_check = None
+	for check in checks:
+		if conf.check_cxx(fragment = (fragment_template % check[0]), uselib = 'EGL GLES2', execute = 0, mandatory = 0, define_ret = 0, msg = 'Checking for %s gccso shader binary definition' % check[2], okmsg = 'yes', errmsg = 'no'):
+			passed_check = check
+			break
+
+	if passed_check:
+		conf.define(passed_check[1], 1)
+		return True
+
+	return False
+
 def check_x11(conf, uselib = ''):
 	conf.check_cxx(mandatory = 1, lib = 'X11', uselib = uselib, uselib_store = 'X11')
 	conf.check_cxx(mandatory = 1, header_name = 'X11/Xlib.h', uselib = uselib, uselib_store = 'X11')
@@ -101,21 +130,23 @@ def check_openvg(conf, uselib = 'EGL'):
 def check_gles1(conf, uselib = 'EGL', lib_list = ['GLESv1_CM', 'GLESV1_CL']):
 	retval = \
 	  check_lib_list(conf = conf, uselib = uselib, uselib_store = 'GLES1', lib_list = lib_list) and \
-	  conf.check_cxx(mandatory = 0, header_name = 'GLES/gl.h', uselib = uselib, uselib_store = 'GLES1')
-	conf.check_cxx(mandatory = 0, header_name = ['GLES2/gl2.h', 'GLES2/gl2ext.h'], uselib = uselib, define_name = 'WITH_GLEXT_H', uselib_store = 'GLES2')
+	  conf.check_cxx(mandatory = 0, header_name = 'GLES/gl.h', uselib = uselib, uselib_store = 'GLES1') and \
+	  conf.check_cxx(mandatory = 0, header_name = ['GLES2/gl2.h', 'GLES2/gl2ext.h'], uselib = uselib, define_name = 'WITH_GLEXT_H', uselib_store = 'GLES2')
 	return retval
 
 def check_gles2(conf, uselib = 'EGL', lib_list = ['GLESv2']):
 	retval = \
 	  check_lib_list(conf = conf, uselib = uselib, uselib_store = 'GLES2', lib_list = lib_list) and \
-	  conf.check_cxx(mandatory = 0, header_name = 'GLES2/gl2.h', uselib = uselib, uselib_store = 'GLES2')
-	conf.check_cxx(mandatory = 0, header_name = ['GLES2/gl2.h', 'GLES2/gl2ext.h'], uselib = uselib, define_name = 'WITH_GL2EXT_H', uselib_store = 'GLES2')
+	  conf.check_cxx(mandatory = 0, header_name = 'GLES2/gl2.h', uselib = uselib, uselib_store = 'GLES2') and \
+	  conf.check_cxx(mandatory = 0, header_name = ['GLES2/gl2.h', 'GLES2/gl2ext.h'], uselib = uselib, define_name = 'WITH_GL2EXT_H', uselib_store = 'GLES2') and \
+	  check_gccso_shader_binary_def(conf)
 	return retval
 
 def check_opengl(conf, uselib = 'EGL'):
 	return \
 	  conf.check_cxx(mandatory = 0, lib = 'GL', uselib = uselib, uselib_store = 'OPENGL') and \
           conf.check_cxx(mandatory = 0, header_name = 'GL/gl.h', uselib = uselib, uselib_store = 'OPENGL')
+
 
 
 # device specific configuration
@@ -226,6 +257,7 @@ def configure_generic_device(conf, platform):
 		conf.env['PLATFORM_USELIBS'] += [gluselib]
 
 	conf.env['PLATFORM_USELIBS'] += ['EGL']
+
 
 
 # main configuration function

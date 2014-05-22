@@ -168,7 +168,11 @@ char const * get_shader_binary_format_string(GLint const p_format)
 		case GL_SHADER_BINARY_VIV: return "SHADER_BINARY_VIV";
 		case GL_MALI_SHADER_BINARY_ARM: return "MALI_SHADER_BINARY";
 		case GL_SHADER_BINARY_DMP: return "SHADER_BINARY_DMP";
+#ifdef WITH_FIXED_GCCSO_SHADER_BINARY_DEF
+		case GL_GCCSO_SHADER_BINARY_FJ: return "FJ_shader_binary_GCCSO";
+#else
 		case GCCSO_SHADER_BINARY_FJ: return "FJ_shader_binary_GCCSO";
+#endif
 		case GL_SGX_BINARY_IMG: return "SGX_BINARY_IMG";
 		default: return 0;
 	}
