@@ -362,12 +362,15 @@ void text_writer::write_main_glapi_info(
 {
 	m_out
 		<< p_api_name << " information:\n"
-		<< "    version string:  " << p_version << "\n"
-		<< "    renderer string: " << p_renderer << "\n"
+		<< "    version string:  " << ((p_version == NULL) ? "[null string]" : p_version) << "\n"
+		<< "    renderer string: " << ((p_renderer == NULL) ? "[null string]" : p_renderer) << "\n"
 		<< "    extensions:\n"
 		;
 
-	print_list("      ", p_extensions);
+	if (p_extensions == NULL)
+		std::cout << "      [null string]\n";
+	else
+		print_list("      ", p_extensions);
 
 }
 
