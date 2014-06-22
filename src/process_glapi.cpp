@@ -158,7 +158,7 @@ bool process_glapi_info(
 		stats.m_shader_stats.m_max_vertex_attribs             = get_gl_integer(GL_MAX_VERTEX_ATTRIBS);
 		stats.m_shader_stats.m_max_vertex_texture_image_units = get_gl_integer(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS);
 		stats.m_shader_stats.m_num_shader_binary_formats      = get_gl_integer(GL_NUM_SHADER_BINARY_FORMATS);
-#ifndef GL_OES_get_program_binary
+#ifdef GL_OES_get_program_binary
 		stats.m_shader_stats.m_num_program_binary_formats     = get_gl_integer(GL_NUM_PROGRAM_BINARY_FORMATS_OES);
 #endif
 		stats.m_shader_stats.m_max_varying_vectors            = get_gl_integer(GL_MAX_VARYING_VECTORS);
@@ -172,7 +172,7 @@ bool process_glapi_info(
 			glGetIntegerv(GL_SHADER_BINARY_FORMATS, &(stats.m_shader_stats.m_shader_binary_formats[0]));
 		}
 
-#ifndef GL_OES_get_program_binary
+#ifdef GL_OES_get_program_binary
 		if (stats.m_shader_stats.m_num_program_binary_formats > 0)
 		{
 			stats.m_shader_stats.m_program_binary_formats.resize(stats.m_shader_stats.m_num_program_binary_formats);
