@@ -19,7 +19,7 @@ executable_name = 'eglinfo'
 ## OPTIONS
 
 
-valid_platforms = ['fb', 'x11']
+valid_platforms = ['fb', 'x11', 'wayland']
 valid_devices = ['generic', 'imx6', 'beagleboard', 'raspberrypi']
 needs_sysroot = ['raspberrypi']
 needs_prefix = ['raspberrypi']
@@ -118,6 +118,12 @@ def check_x11(conf, uselib = ''):
 	conf.check_cxx(mandatory = 1, lib = 'X11', uselib = uselib, uselib_store = 'X11')
 	conf.check_cxx(mandatory = 1, header_name = 'X11/Xlib.h', uselib = uselib, uselib_store = 'X11')
 
+def check_wayland(conf, uselib = ''):
+	return \
+	  conf.check_cfg(mandatory = 0, package = 'wayland-client', uselib_store = 'WAYLAND_CLIENT', args = '--cflags --libs') and \
+	  conf.check_cfg(mandatory = 0, package = 'wayland-cursor', uselib_store = 'WAYLAND_CURSOR', args = '--cflags --libs') and \
+	  conf.check_cfg(mandatory = 0, package = 'wayland-egl',    uselib_store = 'WAYLAND_EGL',    args = '--cflags --libs')
+
 def check_egl(conf, uselib = ''):
 	conf.check_cxx(mandatory = 1, lib = 'EGL', uselib = uselib, uselib_store = 'EGL')
 	conf.check_cxx(mandatory = 1, header_name = 'EGL/egl.h', uselib = uselib, uselib_store = 'EGL')
@@ -161,6 +167,13 @@ def configure_raspberrypi_device(conf, platform):
 		conf.env['PLATFORM_USELIBS'] += ["X11"]
 	elif platform == "fb":
 		conf.env['PLATFORM_SOURCE'] = ['src/platform_fb_raspberrypi.cpp']
+	elif platform == "wayland":
+		check_wayland(conf)
+		conf.env['PLATFORM_SOURCE'] = ['src/platform_wayland_generic.cpp']
+		conf.env['PLATFORM_USELIBS'] += ["WAYLAND_CLIENT", "WAYLAND_CURSOR", "WAYLAND_EGL"]
+	else:
+		conf.fatal('Unsupported Raspberry Pi platform "%s"' % platform)
+		return
 	conf.check_cxx(mandatory = 1, lib = ['GLESv2', 'EGL', 'bcm_host'], uselib_store = 'EGL')
 	import os
 	sysroot = conf.options.sysroot + conf.options.prefix
@@ -183,6 +196,13 @@ def configure_beagleboard_device(conf, platform):
 		conf.env['PLATFORM_USELIBS'] += ["X11"]
 	elif platform == "fb":
 		conf.env['PLATFORM_SOURCE'] = ['src/platform_fb_generic.cpp']
+	elif platform == "wayland":
+		check_wayland(conf)
+		conf.env['PLATFORM_SOURCE'] = ['src/platform_wayland_generic.cpp']
+		conf.env['PLATFORM_USELIBS'] += ["WAYLAND_CLIENT", "WAYLAND_CURSOR", "WAYLAND_EGL"]
+	else:
+		conf.fatal('Unsupported BeagleBoard platform "%s"' % platform)
+		return
 	conf.check_cxx(mandatory = 1, lib = ['EGL', 'IMGegl', 'srv_um'], uselib_store = 'EGL')
 	conf.check_cxx(mandatory = 1, header_name = 'EGL/egl.h', uselib_store = 'EGL')
 	conf.env['WITH_APIS'] = []
@@ -216,6 +236,14 @@ def configure_imx6_device(conf, platform):
 	elif platform == "fb":
 		check_vivante_egl(conf, ['EGL_API_FB'])
 		conf.env['PLATFORM_SOURCE'] = ['src/platform_fb_imx6.cpp']
+	elif platform == "wayland":
+		check_wayland(conf)
+		check_vivante_egl(conf, ['EGL_API_FB', 'WL_EGL_PLATFORM'])
+		conf.env['PLATFORM_SOURCE'] = ['src/platform_wayland_generic.cpp']
+		conf.env['PLATFORM_USELIBS'] += ["WAYLAND_CLIENT", "WAYLAND_CURSOR", "WAYLAND_EGL"]
+	else:
+		conf.fatal('Unsupported imx6 platform "%s"' % platform)
+		return
 	check_gles2(conf)
 	check_openvg(conf)
 
@@ -227,6 +255,13 @@ def configure_generic_device(conf, platform):
 		conf.env['PLATFORM_USELIBS'] += ["X11"]
 	elif platform == "fb":
 		conf.env['PLATFORM_SOURCE'] = ['src/platform_fb_generic.cpp']
+	elif platform == "wayland":
+		check_wayland(conf)
+		conf.env['PLATFORM_SOURCE'] = ['src/platform_wayland_generic.cpp']
+		conf.env['PLATFORM_USELIBS'] += ["WAYLAND_CLIENT", "WAYLAND_CURSOR", "WAYLAND_EGL"]
+	else:
+		conf.fatal('Unsupported Generic Device platform "%s"' % platform)
+		return
 
 	check_egl(conf, '')
 

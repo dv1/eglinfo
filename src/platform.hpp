@@ -42,6 +42,9 @@ class native_display;
 class native_window
 {
 public:
+	struct internals;
+
+
 	native_window(native_display const &p_native_display, EGLint const p_visual_id);
 	~native_window();
 
@@ -64,7 +67,6 @@ private:
 	EGLNativeDisplayType m_egl_native_display;
 	EGLNativeWindowType m_egl_native_window;
 
-	struct internals;
 	internals *m_internals;
 };
 
