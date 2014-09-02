@@ -138,8 +138,9 @@ def check_gles2(conf, uselib = 'EGL', lib_list = ['GLESv2']):
 	retval = \
 	  check_lib_list(conf = conf, uselib = uselib, uselib_store = 'GLES2', lib_list = lib_list) and \
 	  conf.check_cxx(mandatory = 0, header_name = 'GLES2/gl2.h', uselib = uselib, uselib_store = 'GLES2') and \
-	  conf.check_cxx(mandatory = 0, header_name = ['GLES2/gl2.h', 'GLES2/gl2ext.h'], uselib = uselib, define_name = 'WITH_GL2EXT_H', uselib_store = 'GLES2') and \
-	  check_gccso_shader_binary_def(conf)
+	  conf.check_cxx(mandatory = 0, header_name = ['GLES2/gl2.h', 'GLES2/gl2ext.h'], uselib = uselib, define_name = 'WITH_GL2EXT_H', uselib_store = 'GLES2')
+	if retval:
+		check_gccso_shader_binary_def(conf)
 	return retval
 
 def check_opengl(conf, uselib = 'EGL'):
