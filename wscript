@@ -205,7 +205,7 @@ def check_vivante_egl(conf, egl_macro):
 	conf.define('WITH_VIVANTE_EGL', 1)
 def configure_imx6_device(conf, platform):
 	conf.env['PLATFORM_USELIBS'] = ['GLES2', 'OPENVG', 'EGL']
-	conf.env['WITH_APIS'] = ['GLES1', 'GLES2', 'OPENVG']
+	conf.env['WITH_APIS'] = ['GLES2', 'OPENVG']
 	if platform == "x11":
 		check_x11(conf)
 		check_vivante_egl(conf, None)
