@@ -191,12 +191,13 @@ def configure_beagleboard_device(conf, platform):
 	if check_openvg(conf):
 		conf.env['WITH_APIS'] += ['OPENVG']
 
-def check_vivante_egl(conf, egl_macro):
+def check_vivante_egl(conf, egl_extra_defines):
 	conf.check_cxx(mandatory = 1, lib = ['EGL', 'GAL'], uselib_store = 'EGL')
 	old_cxxflags = list(conf.env['CXXFLAGS'])
-	extra_cxxflags = ['-DLINUX']
-	if egl_macro:
-		extra_cxxflags += ['-D%s' % egl_macro]
+	extra_defines = ['LINUX']
+	if egl_extra_defines:
+		extra_defines += egl_extra_defines
+	extra_cxxflags = map(lambda x: conf.env['DEFINES_ST'] % x, extra_defines)
 	conf.env['CXXFLAGS'] += extra_cxxflags
 	conf.check_cxx(mandatory = 1, header_name = 'EGL/eglvivante.h', uselib_store = 'EGL')
 	conf.check_cxx(mandatory = 1, header_name = 'EGL/egl.h', uselib_store = 'EGL')
@@ -213,7 +214,7 @@ def configure_imx6_device(conf, platform):
 		conf.env['PLATFORM_USELIBS'] += ["X11"]
 		conf.env['WITH_APIS'] += ['OPENGL']
 	elif platform == "fb":
-		check_vivante_egl(conf, 'EGL_API_FB')
+		check_vivante_egl(conf, ['EGL_API_FB'])
 		conf.env['PLATFORM_SOURCE'] = ['src/platform_fb_imx6.cpp']
 	check_gles2(conf)
 	check_openvg(conf)
